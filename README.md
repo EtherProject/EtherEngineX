@@ -1,2 +1,2 @@
 # EtherEngineX
-Reconfiguration based on EtherEngine
+Refactor based on EtherEngine
