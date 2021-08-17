@@ -21,6 +21,9 @@
     <ClCompile Include="EtherData.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="EtherModule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EtherAPI.h">
@@ -30,6 +33,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="EtherMacros.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EtherModule.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

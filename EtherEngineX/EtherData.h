@@ -3,16 +3,15 @@
 
 #include <iostream>
 #include <vector>
-using namespace std;
 
 //超类,所有对象继承于他
 class EtherData
 {
 private:
 	//静态变量在管理池中的key
-	vector<EtherData*>::iterator key;
+	std::vector<EtherData*>::iterator key;
 	//静态变量内存管理池
-	static vector<EtherData*> AllData;
+	static std::vector<EtherData*> AllData;
 public:
 	//构造函数会将自己加入到内存管理池中
 	EtherData();

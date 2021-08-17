@@ -143,11 +143,13 @@
   <ItemGroup>
     <ClCompile Include="EtherAPI.cpp" />
     <ClCompile Include="EtherData.cpp" />
+    <ClCompile Include="EtherModule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EtherAPI.h" />
     <ClInclude Include="EtherData.h" />
     <ClInclude Include="EtherMacros.h" />
+    <ClInclude Include="EtherModule.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

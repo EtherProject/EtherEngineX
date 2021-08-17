@@ -1,4 +1,5 @@
 #include "EtherAPI.h"
+using namespace std;
 
 lua_State* pL = luaL_newstate();
 
@@ -40,6 +41,13 @@ void _LoadConfig()
 
 }
 
+ETHER_API getVersion(lua_State* L)
+{
+	lua_pushstring(L, _VERSION_);
+
+	return 1;
+}
+
 int main(int argc, char** argv)
 {
 	//SDL初始化
@@ -52,7 +60,13 @@ int main(int argc, char** argv)
 	//读取配置文件
 	_LoadConfig();
 
+	//注册全局函数
+	lua_register(pL, "GetVersion", getVersion);
+
+	luaL_dofile(pL, "Main.lua");
+
 	//安全退出
 	_HandleQuit();
+	
 	return 0;
 }
