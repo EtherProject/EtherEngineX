@@ -1,7 +1,6 @@
 #include "EtherData.h"
-using namespace std;
 
-vector<EtherData*> EtherData::AllData;
+std::vector<EtherData*> EtherData::AllData;
 
 EtherData::EtherData()
 {

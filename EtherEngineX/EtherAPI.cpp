@@ -1,5 +1,4 @@
 #include "EtherAPI.h"
-using namespace std;
 
 lua_State* pL = luaL_newstate();
 
@@ -30,12 +29,13 @@ void _HandleQuit()
 
 void _LoadConfig()
 {
-	using namespace std;
-	ifstream fin("config.json");
+	std::ifstream fin("config.json");
 	if (!fin.good())
-		cerr << "在尝试加载config时发生错误" << endl;
+		std::cerr << "在尝试加载config时发生错误" << std::endl;
 
-	stringstream ssContent;
+	// 可以尝试使用 AdenJSON 替代 cJSON 解析此处配置文件
+
+	std::stringstream ssContent;
 	ssContent << fin.rdbuf();
 	fin.close(); fin.clear();
 
