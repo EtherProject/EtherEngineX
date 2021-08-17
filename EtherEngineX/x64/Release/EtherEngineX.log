@@ -1,9 +1,9 @@
 ﻿  EtherAPI.cpp
 LINK : warning LNK4098: 默认库“LIBCMT”与其他库的使用冲突；请使用 /NODEFAULTLIB:library
   正在生成代码
-  2 of 2 functions (100.0%) were compiled.
-    1 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+  1 of 215 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
 LuaLib-5.4.0.lib(lapi.obj) : warning LNK4099: 未找到 PDB“LuaLib-5.4.0.pdb”(使用“LuaLib-5.4.0.lib(lapi.obj)”或在“C:\Users\hong\Desktop\GameDesign\EtherEngineX\x64\Release\LuaLib-5.4.0.pdb”中寻找)；正在链接对象，如同没有调试信息一样
 LuaLib-5.4.0.lib(lauxlib.obj) : warning LNK4099: 未找到 PDB“LuaLib-5.4.0.pdb”(使用“LuaLib-5.4.0.lib(lauxlib.obj)”或在“C:\Users\hong\Desktop\GameDesign\EtherEngineX\x64\Release\LuaLib-5.4.0.pdb”中寻找)；正在链接对象，如同没有调试信息一样

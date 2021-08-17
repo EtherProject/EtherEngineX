@@ -1,0 +1,6 @@
+{
+    "entry": "Main.lua",
+    "scene": [
+        {"name" : "Main.lua", "nextScene" : []}
+    ]
+}
