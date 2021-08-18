@@ -2,9 +2,17 @@
 
 namespace EtherAPI {
 	lua_State* pL = luaL_newstate();
+
 	SDL_Event event;
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
+
+	const int WINDOW_FULLSCREEN =			1004;
+	const int WINDOW_FULLSCREEN_DESKTOP =	1005;
+	const int WINDOW_BORDERLESS =			1006;
+	const int WINDOW_RESIZABLE =			1007;
+	const int WINDOW_MAXIMIZED =			1008;
+	const int WINDOW_MINIMIZED =			1009;
 }
 
 void _HandleQuit()
@@ -76,6 +84,8 @@ ETHER_API getVersion(lua_State* L)
 
 ETHER_API createWindow(lua_State* L)
 {
+	using namespace EtherAPI;
+
 	SDL_Rect rect;
 	lua_getfield(L, 2, "x");
 	rect.x = lua_tonumber(L, -1);
@@ -86,7 +96,45 @@ ETHER_API createWindow(lua_State* L)
 	lua_getfield(L, 2, "h");
 	rect.h = lua_tonumber(L, -1);
 
+	int flags = SDL_WINDOW_SHOWN;
+	luaL_argcheck(L, lua_istable(L, 3), 3, "table expected");
+	//第一个键nil
+	lua_pushnil(L);
 
+	while (lua_next(L, 3))
+	{
+		lua_pushvalue(L, -2);
+		switch ((int)lua_tonumber(L, -2))
+		{
+		case WINDOW_FULLSCREEN:
+			flags |= SDL_WINDOW_FULLSCREEN;
+			break;
+		case WINDOW_FULLSCREEN_DESKTOP:
+			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+			break;
+		case WINDOW_BORDERLESS:
+			flags |= SDL_WINDOW_BORDERLESS;
+			break;
+		case WINDOW_RESIZABLE:
+			flags |= SDL_WINDOW_RESIZABLE;
+			break;
+		case WINDOW_MAXIMIZED:
+			flags |= SDL_WINDOW_MAXIMIZED;
+			break;
+		case WINDOW_MINIMIZED:
+			flags |= SDL_WINDOW_MINIMIZED;
+			break;
+		default:
+			luaL_error(L, "bad argument #3 to 'CreateWindow' (the elements of table must be MACRO number, got %s)", luaL_typename(L, -2));
+			break;
+		}
+		lua_pop(L, 2);
+	}
+
+	window = SDL_CreateWindow(luaL_checkstring(L, 1), rect.x, rect.y, rect.w, rect.h, flags);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+	return 0;
 }
 
 int main(int argc, char** argv)
@@ -103,6 +151,8 @@ int main(int argc, char** argv)
 
 	//注册全局函数
 	lua_register(EtherAPI::pL, "GetVersion", getVersion);
+	lua_register(EtherAPI::pL, "UsingModule", usingModule);
+	lua_register(EtherAPI::pL, "CreateWindow", createWindow);
 
 	luaL_dofile(EtherAPI::pL, "Main.lua");
 
