@@ -3,6 +3,7 @@
 
 #include "EtherData.h"
 #include "EtherMacros.h"
+#include "EtherModule.h"
 
 #include <lua.hpp>
 #include <cJSON.h>
@@ -14,10 +15,14 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <unordered_map>
+#include <functional>
 
 void _HandleQuit();
 void _LoadConfig();
 
 ETHER_API getVersion(lua_State* L);
+ETHER_API usingModule(lua_State* L);
+ETHER_API createWindow(lua_State* L);
 
 #endif // !_MAIN_H_

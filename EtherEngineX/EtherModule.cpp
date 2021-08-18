@@ -6,7 +6,6 @@ EtherModule& EtherModule::Instance()
 	return *_instance;
 }
 
-
 void EtherModule::PushMetaDataToGlobal(lua_State* L)
 {
 	for (EtherMetadata metadata : _vMetaData)

@@ -16,7 +16,7 @@ public:
 	//构造函数会将自己加入到内存管理池中
 	EtherData();
 	//析构函数会将自己从内存管理池中移除
-	~EtherData();
+	virtual ~EtherData();
 };
 
 #endif
