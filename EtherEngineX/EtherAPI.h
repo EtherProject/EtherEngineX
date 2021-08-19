@@ -1,9 +1,9 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#include "EtherData.h"
 #include "EtherMacros.h"
 #include "EtherModule.h"
+#include "AdenJSON.h"
 
 #include <lua.hpp>
 #include <cJSON.h>

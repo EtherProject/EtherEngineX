@@ -2,6 +2,7 @@
 
 namespace EtherAPI {
 	lua_State* pL = luaL_newstate();
+	std::string strEntryName;
 
 	SDL_Event event;
 	SDL_Window* window = nullptr;
@@ -14,6 +15,8 @@ namespace EtherAPI {
 	const int WINDOW_MAXIMIZED =			1008;
 	const int WINDOW_MINIMIZED =			1009;
 }
+
+std::unordered_map<std::string, std::vector<std::string>> _nextScene;
 
 void _HandleQuit()
 {
@@ -36,16 +39,41 @@ void _HandleQuit()
 
 void _LoadConfig()
 {
-	std::ifstream fin("config.json");
-	if (!fin.good())
-		std::cerr << "在尝试加载config时发生错误" << std::endl;
+	AdenJSONDocument _config;
+	AdenJSONParseResult _result = _config.LoadFromFile("config.json");
 
-	// 可以尝试使用 AdenJSON 替代 cJSON 解析此处配置文件
+	switch (_result.status)
+	{
+	case AdenJSONParseStatus::IOError:
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Load Configuration Failed", _result.description.c_str(), nullptr);
+		break;
+	case AdenJSONParseStatus::ParseError:
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Parse Configuration Failed", _result.description.c_str(), nullptr);
+		break;
+	default:
+		break;
+	}
 
-	std::stringstream ssContent;
-	ssContent << fin.rdbuf();
-	fin.close(); fin.clear();
+	_config.ObjectForEach([&](const std::string& key, AdenJSONNode& node)-> bool 
+		{
+			if (key == "entry")
+			{
+				EtherAPI::strEntryName = node.GetStringValue();
+				return true;
+			}
+			else if (key == "scene")
+			{
+				node.ArrayForEach([&](int idx, AdenJSONNode& node)-> bool 
+					{
 
+					});
+				return true;
+			}
+			else
+				return true;
+		});
+
+	return;
 }
 
 std::unordered_map<std::string, std::function<EtherModule*()>> _mapMoudles = {
@@ -154,7 +182,7 @@ int main(int argc, char** argv)
 	lua_register(EtherAPI::pL, "UsingModule", usingModule);
 	lua_register(EtherAPI::pL, "CreateWindow", createWindow);
 
-	luaL_dofile(EtherAPI::pL, "Main.lua");
+	std::cin.get();
 
 	//安全退出
 	_HandleQuit();
