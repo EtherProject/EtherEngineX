@@ -1,6 +1,7 @@
 {
     "entry": "Main.lua",
     "scene": [
-        {"name" : "Main.lua", "nextScene" : []}
+        {"name" : "Main.lua", "nextScene" : ["test.lua"]},
+        {"name" : "test.lua", "nextScene" : []}
     ]
 }

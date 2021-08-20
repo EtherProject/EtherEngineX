@@ -19,7 +19,7 @@
 #include <functional>
 
 void _HandleQuit();
-void _LoadConfig();
+bool _LoadConfig();
 
 ETHER_API getVersion(lua_State* L);
 ETHER_API usingModule(lua_State* L);

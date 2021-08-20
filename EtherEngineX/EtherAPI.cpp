@@ -2,7 +2,7 @@
 
 namespace EtherAPI {
 	lua_State* pL = luaL_newstate();
-	std::string strEntryName;
+	std::string strSceneName;
 
 	SDL_Event event;
 	SDL_Window* window = nullptr;
@@ -37,8 +37,10 @@ void _HandleQuit()
 	SDL_Quit();
 }
 
-void _LoadConfig()
+bool _LoadConfig()
 {
+	using namespace std;
+
 	AdenJSONDocument _config;
 	AdenJSONParseResult _result = _config.LoadFromFile("config.json");
 
@@ -46,10 +48,10 @@ void _LoadConfig()
 	{
 	case AdenJSONParseStatus::IOError:
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Load Configuration Failed", _result.description.c_str(), nullptr);
-		break;
+		return false;
 	case AdenJSONParseStatus::ParseError:
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Parse Configuration Failed", _result.description.c_str(), nullptr);
-		break;
+		return false;
 	default:
 		break;
 	}
@@ -58,22 +60,27 @@ void _LoadConfig()
 		{
 			if (key == "entry")
 			{
-				EtherAPI::strEntryName = node.GetStringValue();
+				EtherAPI::strSceneName = node.GetStringValue();
 				return true;
 			}
 			else if (key == "scene")
 			{
-				node.ArrayForEach([&](int idx, AdenJSONNode& node)-> bool 
+				node.ArrayForEach([&](int idx, AdenJSONNode& scene)-> bool
 					{
-
+						scene[string("nextScene")].ArrayForEach([&](int idx, AdenJSONNode& nextScene)-> bool
+							{
+								_nextScene[scene[string("name")].GetStringValue()].push_back(nextScene.GetStringValue());
+								return true;
+							});
+						return true;
 					});
 				return true;
 			}
 			else
-				return true;
+				return false;
 		});
 
-	return;
+	return true;
 }
 
 std::unordered_map<std::string, std::function<EtherModule*()>> _mapMoudles = {
@@ -175,15 +182,43 @@ int main(int argc, char** argv)
 	lua_gc(EtherAPI::pL, LUA_GCINC, 100);
 
 	//读取配置文件
-	_LoadConfig();
+	bool ok = _LoadConfig();
+	if (!ok) return 0;
 
 	//注册全局函数
 	lua_register(EtherAPI::pL, "GetVersion", getVersion);
 	lua_register(EtherAPI::pL, "UsingModule", usingModule);
 	lua_register(EtherAPI::pL, "CreateWindow", createWindow);
 
-	std::cin.get();
+	int sceneIndex = 0;
+	//在C++中为-1，而在lua中为0
+	while (sceneIndex != -1)
+	{
+		int bRect = luaL_dofile(EtherAPI::pL, EtherAPI::strSceneName.c_str());
+		if (bRect)
+		{
+			luaL_error(EtherAPI::pL, "An error occurred while trying to load %s", EtherAPI::strSceneName);
+			return 0;
+		}
+		std::string moduleName = EtherAPI::strSceneName.substr(0, EtherAPI::strSceneName.size() - 4);
 
+		lua_getglobal(EtherAPI::pL, moduleName.c_str());
+		//调用init函数(没有返回值)
+		lua_getfield(EtherAPI::pL, -1, "init");
+		lua_pcall(EtherAPI::pL, 0, 0, 0);
+		//调用update函数(返回值为下个场景索引)
+		lua_getfield(EtherAPI::pL, -1, "update");
+		lua_pcall(EtherAPI::pL, 0, 1, 0);
+		sceneIndex = lua_tointeger(EtherAPI::pL, -1) - 1;
+		lua_pop(EtherAPI::pL, 1);
+		lua_getfield(EtherAPI::pL, -1, "unload");
+		lua_pcall(EtherAPI::pL, 0, 0, 0);
+		if (sceneIndex >= 0)
+			EtherAPI::strSceneName = _nextScene[EtherAPI::strSceneName][sceneIndex];
+	}
+	lua_pop(EtherAPI::pL, 1);
+
+	std::cin.get();
 	//安全退出
 	_HandleQuit();
 	
