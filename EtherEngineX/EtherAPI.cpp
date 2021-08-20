@@ -14,6 +14,9 @@ namespace EtherAPI {
 	const int WINDOW_RESIZABLE =			1007;
 	const int WINDOW_MAXIMIZED =			1008;
 	const int WINDOW_MINIMIZED =			1009;
+
+	const int QuitGame = -2;
+	const int Continue = -1;
 }
 
 std::unordered_map<std::string, std::vector<std::string>> _nextScene;
@@ -190,12 +193,13 @@ int main(int argc, char** argv)
 	lua_register(EtherAPI::pL, "UsingModule", usingModule);
 	lua_register(EtherAPI::pL, "CreateWindow", createWindow);
 
-	int sceneIndex = 0;
-	//在C++中为-1，而在lua中为0
-	while (sceneIndex != -1)
+	int sceneIndex = EtherAPI::Continue;
+	//在C++中为-2，而在lua中为-1
+	while (sceneIndex != EtherAPI::QuitGame)
 	{
-		int bRect = luaL_dofile(EtherAPI::pL, EtherAPI::strSceneName.c_str());
-		if (bRect)
+		sceneIndex = EtherAPI::Continue;
+		int bRet = luaL_dofile(EtherAPI::pL, EtherAPI::strSceneName.c_str());
+		if (bRet)
 		{
 			luaL_error(EtherAPI::pL, "An error occurred while trying to load %s", EtherAPI::strSceneName);
 			return 0;
@@ -205,15 +209,23 @@ int main(int argc, char** argv)
 		lua_getglobal(EtherAPI::pL, moduleName.c_str());
 		//调用init函数(没有返回值)
 		lua_getfield(EtherAPI::pL, -1, "init");
-		lua_pcall(EtherAPI::pL, 0, 0, 0);
+		lua_call(EtherAPI::pL, 0, 0);
+
 		//调用update函数(返回值为下个场景索引)
-		lua_getfield(EtherAPI::pL, -1, "update");
-		lua_pcall(EtherAPI::pL, 0, 1, 0);
-		sceneIndex = lua_tointeger(EtherAPI::pL, -1) - 1;
-		lua_pop(EtherAPI::pL, 1);
+		while (sceneIndex == EtherAPI::Continue)
+		{
+			unsigned int initTime = SDL_GetTicks();
+			lua_getfield(EtherAPI::pL, -1, "update");
+			lua_call(EtherAPI::pL, 0, 1);
+			sceneIndex = lua_tointeger(EtherAPI::pL, -1) - 1;
+			lua_pop(EtherAPI::pL, 1);
+			unsigned int currentTime = SDL_GetTicks();
+			SDL_Delay(1000 / 60 - (currentTime - initTime));
+		}
+
 		lua_getfield(EtherAPI::pL, -1, "unload");
-		lua_pcall(EtherAPI::pL, 0, 0, 0);
-		if (sceneIndex >= 0)
+		lua_call(EtherAPI::pL, 0, 0);
+		if (sceneIndex >= 0 && sceneIndex < _nextScene[EtherAPI::strSceneName].size())
 			EtherAPI::strSceneName = _nextScene[EtherAPI::strSceneName][sceneIndex];
 	}
 	lua_pop(EtherAPI::pL, 1);
