@@ -13,9 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\AdenJSON">
+      <UniqueIdentifier>{2a645e1b-df69-43da-be4d-15e960a830b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\AdneJSON">
+      <UniqueIdentifier>{31929e46-cf68-44bf-abf2-3d4776a1cd5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EtherAPI.cpp">
+    <ClCompile Include="EtherEngineX.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="EtherModule.cpp">
@@ -25,11 +31,11 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="AdenJSON.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\AdneJSON</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EtherAPI.h">
+    <ClInclude Include="EtherEngineX.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="EtherMacros.h">
@@ -42,7 +48,7 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="AdenJSON.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\AdenJSON</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
-#ifndef _MAIN_H_
-#define _MAIN_H_
+#ifndef _ETHER_ENGINE_X_H_
+#define _ETHER_ENGINE_X_H_
 
 #include "EtherMacros.h"
 #include "EtherModule.h"
@@ -25,4 +25,4 @@ ETHER_API getVersion(lua_State* L);
 ETHER_API usingModule(lua_State* L);
 ETHER_API createWindow(lua_State* L);
 
-#endif // !_MAIN_H_
+#endif // !_ETHER_ENGINE_X_H_
