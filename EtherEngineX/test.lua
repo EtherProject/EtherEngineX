@@ -6,7 +6,7 @@ end
 
 function test.update()
     print("Here are test.update")
-    return -1
+    return 0
 end
 
 function test.unload()
