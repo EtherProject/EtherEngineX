@@ -33,6 +33,9 @@
     <ClCompile Include="AdenJSON.cpp">
       <Filter>源文件\AdneJSON</Filter>
     </ClCompile>
+    <ClCompile Include="EtherData.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EtherEngineX.h">
@@ -49,6 +52,9 @@
     </ClInclude>
     <ClInclude Include="AdenJSON.h">
       <Filter>头文件\AdenJSON</Filter>
+    </ClInclude>
+    <ClInclude Include="EtherData.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

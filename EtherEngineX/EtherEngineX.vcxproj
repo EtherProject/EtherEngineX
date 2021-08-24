@@ -145,12 +145,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AdenJSON.cpp" />
+    <ClCompile Include="EtherData.cpp" />
     <ClCompile Include="EtherEngineX.cpp" />
     <ClCompile Include="EtherModule.cpp" />
     <ClCompile Include="EtherNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdenJSON.h" />
+    <ClInclude Include="EtherData.h" />
     <ClInclude Include="EtherEngineX.h" />
     <ClInclude Include="EtherMacros.h" />
     <ClInclude Include="EtherModule.h" />
