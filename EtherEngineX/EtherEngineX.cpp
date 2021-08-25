@@ -8,12 +8,15 @@ namespace EtherEngineX {
 	SDL_Window* pWindow = nullptr;
 	SDL_Renderer* pWRenderer = nullptr;
 
-	const int WINDOW_FULLSCREEN =			1004;
-	const int WINDOW_FULLSCREEN_DESKTOP =	1005;
-	const int WINDOW_BORDERLESS =			1006;
-	const int WINDOW_RESIZABLE =			1007;
-	const int WINDOW_MAXIMIZED =			1008;
-	const int WINDOW_MINIMIZED =			1009;
+	enum class WINDOW
+	{
+		FULLSCREEN = 1004,
+		FULLSCREEN_DESKTOP = 1005,
+		BORDERLESS = 1006,
+		RESIZABLE = 1007,
+		MAXIMIZED = 1008,
+		MINIMIZED = 1009
+	};
 
 	const int QuitGame = -2;
 	const int Continue = -1;
@@ -142,22 +145,22 @@ ETHER_API createWindow(lua_State* L)
 		lua_pushvalue(L, -2);
 		switch ((int)lua_tonumber(L, -2))
 		{
-		case EtherEngineX::WINDOW_FULLSCREEN:
+		case (int)EtherEngineX::WINDOW::FULLSCREEN:
 			flags |= SDL_WINDOW_FULLSCREEN;
 			break;
-		case EtherEngineX::WINDOW_FULLSCREEN_DESKTOP:
+		case (int)EtherEngineX::WINDOW::FULLSCREEN_DESKTOP:
 			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 			break;
-		case EtherEngineX::WINDOW_BORDERLESS:
+		case (int)EtherEngineX::WINDOW::BORDERLESS:
 			flags |= SDL_WINDOW_BORDERLESS;
 			break;
-		case EtherEngineX::WINDOW_RESIZABLE:
+		case (int)EtherEngineX::WINDOW::RESIZABLE:
 			flags |= SDL_WINDOW_RESIZABLE;
 			break;
-		case EtherEngineX::WINDOW_MAXIMIZED:
+		case (int)EtherEngineX::WINDOW::MAXIMIZED:
 			flags |= SDL_WINDOW_MAXIMIZED;
 			break;
-		case EtherEngineX::WINDOW_MINIMIZED:
+		case (int)EtherEngineX::WINDOW::MINIMIZED:
 			flags |= SDL_WINDOW_MINIMIZED;
 			break;
 		default:

@@ -1,7 +1,11 @@
 #ifndef _DATA_H_
 #define _DATA_H_
 
+#include "EtherMacros.h"
+#include "EtherModule.h"
+
 #include<unordered_map>
+#include<lua.hpp>
 
 enum class DataType
 {
@@ -24,7 +28,6 @@ protected:
 	int key;
 	//数据的类型,作为dataInUse中的key
 	DataType type;
-	
 	//用vector保存这些数据效率会比较低,以后可能会更换
 	static std::unordered_map<DataType, std::vector<EtherData>> dataInUse;
 	static std::unordered_map<DataType, std::vector<EtherData>> dataNotInUse;
