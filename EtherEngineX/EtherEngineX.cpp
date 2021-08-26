@@ -90,10 +90,10 @@ bool _LoadConfig()
 }
 
 std::unordered_map<std::string, std::function<EtherModule*()>> _mapMoudles = {
-
+	{ "EtherNode", [] {return &ModuleNode::Instance(); } }
 };
 
-ETHER_API usingModule(lua_State* L)
+ETHER_API UsingModule(lua_State* L)
 {
 	//寻找对应这个名字的Module
 	auto iter = _mapMoudles.find(luaL_checkstring(L, 1));
@@ -116,14 +116,14 @@ ETHER_API usingModule(lua_State* L)
 	return 1;
 }
 
-ETHER_API getVersion(lua_State* L)
+ETHER_API GetVersion(lua_State* L)
 {
 	lua_pushstring(L, _VERSION_);
 
 	return 1;
 }
 
-ETHER_API createWindow(lua_State* L)
+ETHER_API CreateWindow(lua_State* L)
 {
 	SDL_Rect rcWindow;
 	lua_getfield(L, 2, "x");
@@ -190,9 +190,9 @@ int main(int argc, char** argv)
 	if (!ok) return 0;
 
 	//注册全局函数
-	lua_register(EtherEngineX::pLState, "GetVersion", getVersion);
-	lua_register(EtherEngineX::pLState, "UsingModule", usingModule);
-	lua_register(EtherEngineX::pLState, "CreateWindow", createWindow);
+	lua_register(EtherEngineX::pLState, "GetVersion", GetVersion);
+	lua_register(EtherEngineX::pLState, "UsingModule", UsingModule);
+	lua_register(EtherEngineX::pLState, "CreateWindow", CreateWindow);
 
 	int sceneIndex = EtherEngineX::Continue;
 	//在C++中为-2，而在lua中为-1

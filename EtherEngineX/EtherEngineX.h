@@ -5,6 +5,8 @@
 #include "EtherModule.h"
 #include "AdenJSON.h"
 
+#include "EtherNode.h"
+
 #include <lua.hpp>
 #include <cJSON.h>
 #include <SDL.h>
@@ -21,8 +23,8 @@
 void _HandleQuit();
 bool _LoadConfig();
 
-ETHER_API getVersion(lua_State* L);
-ETHER_API usingModule(lua_State* L);
-ETHER_API createWindow(lua_State* L);
+ETHER_API GetVersion(lua_State* L);
+ETHER_API UsingModule(lua_State* L);
+ETHER_API CreateWindow(lua_State* L);
 
 #endif // !_ETHER_ENGINE_X_H_

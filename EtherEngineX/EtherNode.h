@@ -3,6 +3,7 @@
 
 #include "EtherData.h"
 #include "EtherMacros.h"
+#include "EtherUtils.h"
 
 #include <vector>
 #include <lua.hpp>
@@ -23,6 +24,8 @@ public:
 	int x, y;
 	//节点的z轴坐标,用于描述遮挡关系
 	int depth;
+	//是否正在持续更新
+	bool isRuning;
 	//父节点
 	EtherNode* parent;
 	//子节点向量
@@ -38,7 +41,14 @@ private:
 	ModuleNode();
 };
 
-ETHER_API node_CreateNode(lua_State* L);
+ETHER_API CreateNode(lua_State* L);
+ETHER_API node_SetPosition(lua_State* L);
+ETHER_API node_GetPosition(lua_State* L);
+ETHER_API node_SetParent(lua_State* L);
+ETHER_API node_GetParent(lua_State* L);
+ETHER_API node_SetDepth(lua_State* L);
+ETHER_API node_GetDepth(lua_State* L);
+ETHER_API node_Release(lua_State* L);
 ETHER_API __gc_Node(lua_State* L);
 
 #endif // !_NODE_H_
