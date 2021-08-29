@@ -6,6 +6,7 @@
 #include "AdenJSON.h"
 
 #include "EtherNode.h"
+#include "EtherWindow.h"
 
 #include <lua.hpp>
 #include <cJSON.h>

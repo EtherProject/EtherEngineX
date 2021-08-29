@@ -145,20 +145,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AdenJSON.cpp" />
-    <ClCompile Include="EtherData.cpp" />
+    <ClCompile Include="EtherAction.cpp" />
     <ClCompile Include="EtherEngineX.cpp" />
+    <ClCompile Include="EtherLayer.cpp" />
     <ClCompile Include="EtherModule.cpp" />
     <ClCompile Include="EtherNode.cpp" />
     <ClCompile Include="EtherUtils.cpp" />
+    <ClCompile Include="EtherWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdenJSON.h" />
-    <ClInclude Include="EtherData.h" />
+    <ClInclude Include="EtherAction.h" />
     <ClInclude Include="EtherEngineX.h" />
+    <ClInclude Include="EtherLayer.h" />
     <ClInclude Include="EtherMacros.h" />
     <ClInclude Include="EtherModule.h" />
     <ClInclude Include="EtherNode.h" />
     <ClInclude Include="EtherUtils.h" />
+    <ClInclude Include="EtherWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

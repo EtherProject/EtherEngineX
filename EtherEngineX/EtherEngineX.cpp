@@ -8,16 +8,6 @@ namespace EtherEngineX {
 	SDL_Window* pWindow = nullptr;
 	SDL_Renderer* pWRenderer = nullptr;
 
-	enum class WINDOW
-	{
-		FULLSCREEN = 1004,
-		FULLSCREEN_DESKTOP = 1005,
-		BORDERLESS = 1006,
-		RESIZABLE = 1007,
-		MAXIMIZED = 1008,
-		MINIMIZED = 1009
-	};
-
 	const int QuitGame = -2;
 	const int Continue = -1;
 }
@@ -90,7 +80,8 @@ bool _LoadConfig()
 }
 
 std::unordered_map<std::string, std::function<EtherModule*()>> _mapMoudles = {
-	{ "EtherNode", [] {return &ModuleNode::Instance(); } }
+	{ "EtherNode", [] {return &ModuleNode::Instance(); } },
+	{ "EtherWindow",[] {return &ModuleWindow::Instance(); }}
 };
 
 ETHER_API UsingModule(lua_State* L)
@@ -123,59 +114,6 @@ ETHER_API GetVersion(lua_State* L)
 	return 1;
 }
 
-ETHER_API CreateWindow(lua_State* L)
-{
-	SDL_Rect rcWindow;
-	lua_getfield(L, 2, "x");
-	rcWindow.x = lua_tonumber(L, -1);
-	lua_getfield(L, 2, "y");
-	rcWindow.y = lua_tonumber(L, -1);
-	lua_getfield(L, 2, "w");
-	rcWindow.w = lua_tonumber(L, -1);
-	lua_getfield(L, 2, "h");
-	rcWindow.h = lua_tonumber(L, -1);
-
-	int flags = SDL_WINDOW_SHOWN;
-	luaL_argcheck(L, lua_istable(L, 3), 3, "table expected");
-	//第一个键nil
-	lua_pushnil(L);
-
-	while (lua_next(L, 3))
-	{
-		lua_pushvalue(L, -2);
-		switch ((int)lua_tonumber(L, -2))
-		{
-		case (int)EtherEngineX::WINDOW::FULLSCREEN:
-			flags |= SDL_WINDOW_FULLSCREEN;
-			break;
-		case (int)EtherEngineX::WINDOW::FULLSCREEN_DESKTOP:
-			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-			break;
-		case (int)EtherEngineX::WINDOW::BORDERLESS:
-			flags |= SDL_WINDOW_BORDERLESS;
-			break;
-		case (int)EtherEngineX::WINDOW::RESIZABLE:
-			flags |= SDL_WINDOW_RESIZABLE;
-			break;
-		case (int)EtherEngineX::WINDOW::MAXIMIZED:
-			flags |= SDL_WINDOW_MAXIMIZED;
-			break;
-		case (int)EtherEngineX::WINDOW::MINIMIZED:
-			flags |= SDL_WINDOW_MINIMIZED;
-			break;
-		default:
-			luaL_error(L, "bad argument #3 to 'CreateWindow' (the elements of table must be MACRO number, got %s)", luaL_typename(L, -2));
-			break;
-		}
-		lua_pop(L, 2);
-	}
-
-	EtherEngineX::pWindow = SDL_CreateWindow(luaL_checkstring(L, 1), rcWindow.x, rcWindow.y, rcWindow.w, rcWindow.h, flags);
-	EtherEngineX::pWRenderer = SDL_CreateRenderer(EtherEngineX::pWindow, -1, SDL_RENDERER_ACCELERATED);
-
-	return 0;
-}
-
 int main(int argc, char** argv)
 {
 	//SDL初始化
@@ -192,7 +130,6 @@ int main(int argc, char** argv)
 	//注册全局函数
 	lua_register(EtherEngineX::pLState, "GetVersion", GetVersion);
 	lua_register(EtherEngineX::pLState, "UsingModule", UsingModule);
-	lua_register(EtherEngineX::pLState, "CreateWindow", CreateWindow);
 
 	int sceneIndex = EtherEngineX::Continue;
 	//在C++中为-2，而在lua中为-1
@@ -207,19 +144,19 @@ int main(int argc, char** argv)
 		std::string moduleName = EtherEngineX::strSceneName.substr(0, EtherEngineX::strSceneName.size() - 4);
 
 		lua_getglobal(EtherEngineX::pLState, moduleName.c_str());
-		//调用init函数(没有返回值)
-		lua_getfield(EtherEngineX::pLState, -1, "init");
+		//调用Init函数(没有返回值)
+		lua_getfield(EtherEngineX::pLState, -1, "Init");
 		if (lua_pcall(EtherEngineX::pLState, 0, 0, 0))
 		{
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Error Occured During Init", lua_tostring(EtherEngineX::pLState, -1), nullptr);
 			return -2; // 异常返回值，同上
 		}
 
-		//调用update函数(返回值为下个场景索引)
+		//调用Update函数(返回值为下个场景索引)
 		while (sceneIndex == EtherEngineX::Continue)
 		{
 			unsigned int timeFrameStart = SDL_GetTicks();
-			lua_getfield(EtherEngineX::pLState, -1, "update");
+			lua_getfield(EtherEngineX::pLState, -1, "Update");
 			if (lua_pcall(EtherEngineX::pLState, 0, 1, 0))
 			{
 				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Error Occured During Update", lua_tostring(EtherEngineX::pLState, -1), nullptr);
@@ -232,7 +169,7 @@ int main(int argc, char** argv)
 				SDL_Delay(1000 / 60 - (timeFrameEnd - timeFrameStart));
 		}
 
-		lua_getfield(EtherEngineX::pLState, -1, "unload");
+		lua_getfield(EtherEngineX::pLState, -1, "Unload");
 		if (lua_pcall(EtherEngineX::pLState, 0, 0, 0))
 		{
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Error Occured During Unload", lua_tostring(EtherEngineX::pLState, -1), nullptr);

@@ -2,9 +2,6 @@
 
 using namespace std;
 
-extern unordered_map<DataType, vector<EtherData*>> dataInUse;
-extern unordered_map<DataType, vector<EtherData*>> dataNotInUse;
-
 ModuleNode::ModuleNode()
 {
 	_vCMethods =
@@ -23,7 +20,8 @@ ModuleNode::ModuleNode()
 				{"GetParent", node_GetParent},
 				{"SetDepth", node_SetDepth},
 				{"GetDepth", node_GetDepth},
-				{"Release", node_Release}
+				{"AddChild", node_AddChild},
+				{"EraseChild", node_EraseChild}
 			},
 			__gc_Node
 		}
@@ -36,25 +34,21 @@ ModuleNode& ModuleNode::Instance()
 	return *_instance;
 }
 
-//EtherNode类
+// EtherNode类
 
-EtherNode::EtherNode() : EtherData(), x(0), y(0), depth(0), isRuning(1), parent(nullptr)
+EtherNode::EtherNode() : x(0), y(0), depth(0), isRuning(1), parent(nullptr)
 {
-	type = DataType::Node;
-	dataInUse[type].push_back(this);
-	key = dataInUse[type].size() - 1;
+	//负责将该对象压入内存池
 }
 
 EtherNode::~EtherNode()
 {
-	//负责将该对象从内存池里面弹出来
-	vector<EtherData*>::iterator temp = dataNotInUse[type].begin() + key;
-	dataNotInUse[type].erase(temp);
+	// 负责将该对象从内存池里面弹出来
 }
 
 ETHER_API CreateNode(lua_State* L)
 {
-	EtherNode* pNode = new EtherNode;
+	EtherNode* pNode = new EtherNode();
 	EtherNode** uppNode = (EtherNode**)lua_newuserdata(L, sizeof(EtherNode*));
 	*uppNode = pNode;
 	luaL_getmetatable(L, "EtherNode");
@@ -92,6 +86,7 @@ ETHER_API node_SetParent(lua_State* L)
 	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
 	EtherNode* parent = (EtherNode*)(*(void**)luaL_checkudata(L, 2, "EtherNode"));
 	pNode->parent = parent;
+	parent->children.push_back(pNode);
 
 	return 0;
 }
@@ -124,14 +119,24 @@ ETHER_API node_GetDepth(lua_State* L)
 	return 1;
 }
 
-ETHER_API node_Release(lua_State* L)
+ETHER_API node_AddChild(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
-	vector<EtherData*>::iterator temp = dataInUse[pNode->type].begin() + pNode->key;
-	dataInUse[pNode->type].erase(temp);
-	dataNotInUse[pNode->type].push_back(pNode);
-	pNode->key = dataNotInUse[pNode->type].size() - 1;
+	EtherNode* pChild = (EtherNode*)(*(void**)luaL_checkudata(L, 2, "EtherNode"));
+	pNode->children.push_back(pChild);
+	pChild->parent = pNode;
 
+	return 0;
+}
+
+ETHER_API node_EraseChild(lua_State* L)
+{
+	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
+	int index = lua_tonumber(L, 2);
+	pNode->children[index - 1]->parent = nullptr;
+	vector<EtherNode*>::iterator iterNode = pNode->children.begin() + index;
+	pNode->children.erase(iterNode);
+	
 	return 0;
 }
 

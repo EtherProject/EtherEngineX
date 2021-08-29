@@ -33,10 +33,16 @@
     <ClCompile Include="AdenJSON.cpp">
       <Filter>源文件\AdneJSON</Filter>
     </ClCompile>
-    <ClCompile Include="EtherData.cpp">
+    <ClCompile Include="EtherUtils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="EtherUtils.cpp">
+    <ClCompile Include="EtherAction.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EtherLayer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EtherWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,10 +62,16 @@
     <ClInclude Include="AdenJSON.h">
       <Filter>头文件\AdenJSON</Filter>
     </ClInclude>
-    <ClInclude Include="EtherData.h">
+    <ClInclude Include="EtherUtils.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="EtherUtils.h">
+    <ClInclude Include="EtherAction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EtherLayer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EtherWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

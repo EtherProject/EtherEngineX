@@ -1,7 +1,7 @@
 #ifndef _NODE_H_
 #define _NODE_H_
 
-#include "EtherData.h"
+#include "EtherModule.h"
 #include "EtherMacros.h"
 #include "EtherUtils.h"
 
@@ -12,7 +12,7 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 
-class EtherNode :public EtherData
+class EtherNode
 {
 public:
 	//将其丢进内存管理池中
@@ -42,13 +42,24 @@ private:
 };
 
 ETHER_API CreateNode(lua_State* L);
+
 ETHER_API node_SetPosition(lua_State* L);
+
 ETHER_API node_GetPosition(lua_State* L);
+
 ETHER_API node_SetParent(lua_State* L);
+
 ETHER_API node_GetParent(lua_State* L);
+
 ETHER_API node_SetDepth(lua_State* L);
+
 ETHER_API node_GetDepth(lua_State* L);
-ETHER_API node_Release(lua_State* L);
+
+ETHER_API node_AddChild(lua_State* L);
+
+//删除位于子节点向量中指定索引的子节点
+ETHER_API node_EraseChild(lua_State* L);
+
 ETHER_API __gc_Node(lua_State* L);
 
 #endif // !_NODE_H_
