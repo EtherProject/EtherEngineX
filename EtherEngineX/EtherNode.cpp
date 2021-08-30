@@ -2,6 +2,12 @@
 
 using namespace std;
 
+ModuleNode& ModuleNode::Instance()
+{
+	static ModuleNode* _instance = new ModuleNode();
+	return *_instance;
+}
+
 ModuleNode::ModuleNode()
 {
 	_vCMethods =
@@ -27,14 +33,6 @@ ModuleNode::ModuleNode()
 		}
 	};
 }
-
-ModuleNode& ModuleNode::Instance()
-{
-	static ModuleNode* _instance = new ModuleNode();
-	return *_instance;
-}
-
-// EtherNode¿‡
 
 EtherNode::EtherNode() : x(0), y(0), depth(0), isRuning(1), parent(nullptr)
 {

@@ -280,7 +280,6 @@ ETHER_API window_SetWindowPosition(lua_State* L)
 ETHER_API __gc_Window(lua_State* L)
 {
 	EtherWindow* pEWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
-	SDL_DestroyWindow(pEWindow->pWindow);
 	delete pEWindow;
 
 	return 0;

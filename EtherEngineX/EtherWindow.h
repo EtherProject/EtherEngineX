@@ -18,7 +18,7 @@ class EtherWindow
 public:
 	EtherWindow() {}
 	EtherWindow(SDL_Window* _pWindow) { pWindow = _pWindow; }
-	~EtherWindow() {}
+	~EtherWindow() { SDL_DestroyWindow(pWindow); }
 	SDL_Window* pWindow = nullptr;
 	std::vector<EtherLayer*> vLayer;
 };
