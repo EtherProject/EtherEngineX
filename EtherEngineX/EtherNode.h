@@ -19,6 +19,8 @@ public:
 	EtherNode();
 	//将其从内存管理池中删除
 	~EtherNode();
+	//绘制当前节点的内容
+	virtual void Draw() {}
 
 	//以父节点为基础,节点对应的坐标
 	int x, y;

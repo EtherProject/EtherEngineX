@@ -4,6 +4,7 @@
 #include "EtherNode.h"
 #include "EtherWindow.h"
 
+#include <vector>
 #include <lua.hpp>
 #include <SDL.h>
 #include <SDL_image.h>
@@ -19,6 +20,7 @@ public:
 	virtual ~EtherLayer() { SDL_DestroyRenderer(pRenderer); }
 
 	SDL_Renderer* pRenderer;
+	std::vector<EtherNode*> vAllNode;
 };
 
 class ModuleLayer : public EtherModule
@@ -31,6 +33,10 @@ private:
 };
 
 ETHER_API CreateLayer(lua_State* L);
+
+ETHER_API layer_AddNode(lua_State* L);
+
+ETHER_API layer_EraseNode(lua_State* L);
 
 ETHER_API __gc_Layer(lua_State* L);
 

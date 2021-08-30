@@ -1,5 +1,7 @@
 #include "EtherWindow.h"
 
+std::unordered_map<const char*, EtherWindow*> mapAllWindows;
+
 enum class WINDOW
 {
 	POSITION_DEFAULT = INT_MIN,
@@ -117,7 +119,15 @@ ETHER_API CreateWindow(lua_State* L)
 		lua_pop(L, 2);
 	}
 
-	EtherWindow* pEWindow = new EtherWindow(SDL_CreateWindow(luaL_checkstring(L, 1), rect.x, rect.y, rect.w, rect.h, flags));
+	//创建一个Window
+	const char* strName = luaL_checkstring(L, 1);
+	EtherWindow* pEWindow = new EtherWindow(SDL_CreateWindow(strName, rect.x, rect.y, rect.w, rect.h, flags));
+	pEWindow->name = strName;
+
+	//给全局窗口表推送一个
+	mapAllWindows[strName] = pEWindow;
+
+	//给lua虚拟机推送一个
 	EtherWindow** uppWindow = (EtherWindow**)lua_newuserdata(L, sizeof(EtherWindow*));
 	*uppWindow = pEWindow;
 	luaL_getmetatable(L, "EtherWindow");
@@ -130,6 +140,9 @@ ETHER_API window_CloseWindow(lua_State* L)
 {
 	EtherWindow* pEWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
 	SDL_DestroyWindow(pEWindow->pWindow);
+
+	mapAllWindows.erase(mapAllWindows.find(pEWindow->name));
+
 	delete pEWindow;
 
 	return 0;
@@ -138,7 +151,7 @@ ETHER_API window_CloseWindow(lua_State* L)
 ETHER_API window_GetWindowTitle(lua_State* L)
 {
 	EtherWindow* pEWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
-	lua_pushstring(L, SDL_GetWindowTitle(pEWindow->pWindow));
+	lua_pushstring(L, pEWindow->name);
 
 	return 1;
 }
@@ -146,7 +159,8 @@ ETHER_API window_GetWindowTitle(lua_State* L)
 ETHER_API window_SetWindowTitle(lua_State* L)
 {
 	EtherWindow* pEWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
-	SDL_SetWindowTitle(pEWindow->pWindow, luaL_checkstring(L, 2));
+	pEWindow->name = luaL_checkstring(L, 2);
+	SDL_SetWindowTitle(pEWindow->pWindow, pEWindow->name);
 
 	return 0;
 }

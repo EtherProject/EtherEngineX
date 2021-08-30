@@ -26,6 +26,5 @@ bool _LoadConfig();
 
 ETHER_API GetVersion(lua_State* L);
 ETHER_API UsingModule(lua_State* L);
-ETHER_API CreateWindow(lua_State* L);
 
 #endif // !_ETHER_ENGINE_X_H_

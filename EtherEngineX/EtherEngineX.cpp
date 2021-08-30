@@ -5,12 +5,12 @@ namespace EtherEngineX {
 	std::string strSceneName;
 
 	SDL_Event event;
-	SDL_Window* pWindow = nullptr;
-	SDL_Renderer* pWRenderer = nullptr;
 
 	const int QuitGame = -2;
 	const int Continue = -1;
 }
+
+extern std::unordered_map<const char*, EtherWindow*> mapAllWindows;
 
 std::unordered_map<std::string, std::vector<std::string>> _nextScene;
 
@@ -20,16 +20,6 @@ void _HandleQuit()
 	Mix_CloseAudio();
 	Mix_Quit();
 	TTF_Quit();
-
-	SDL_DestroyRenderer(EtherEngineX::pWRenderer);
-	EtherEngineX::pWRenderer = nullptr;
-
-	if (EtherEngineX::pWindow)
-	{
-		SDL_DestroyWindow(EtherEngineX::pWindow);
-		EtherEngineX::pWindow = nullptr;
-	}
-
 	SDL_Quit();
 }
 
@@ -152,10 +142,21 @@ int main(int argc, char** argv)
 			return -2; // 异常返回值，同上
 		}
 
-		//调用Update函数(返回值为下个场景索引)
+		//Update函数返回值用于判断是否退出该场景,并决定下一个场景是谁
 		while (sceneIndex == EtherEngineX::Continue)
 		{
 			unsigned int timeFrameStart = SDL_GetTicks();
+
+			//将画面绘制出来
+			std::unordered_map<const char*, EtherWindow*>::iterator iterEnd = mapAllWindows.end();
+			for (std::unordered_map<const char*, EtherWindow*>::iterator iter = mapAllWindows.begin(); iter != iterEnd; iter++)
+			{
+				std::vector<EtherLayer*> vCampLayer = (*iter).second->vLayer;
+				for (int i = vCampLayer.size() - 1; i >= 0; i--)
+					vCampLayer[i]->Draw();
+			}
+
+			//调用Update函数
 			lua_getfield(EtherEngineX::pLState, -1, "Update");
 			if (lua_pcall(EtherEngineX::pLState, 0, 1, 0))
 			{
@@ -164,6 +165,7 @@ int main(int argc, char** argv)
 			}
 			sceneIndex = lua_tointeger(EtherEngineX::pLState, -1) - 1;
 			lua_pop(EtherEngineX::pLState, 1);
+
 			unsigned int timeFrameEnd = SDL_GetTicks();
 			if (timeFrameEnd - timeFrameStart < 1000 / 60)
 				SDL_Delay(1000 / 60 - (timeFrameEnd - timeFrameStart));

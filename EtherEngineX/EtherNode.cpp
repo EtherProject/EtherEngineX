@@ -34,8 +34,9 @@ ModuleNode::ModuleNode()
 	};
 }
 
-EtherNode::EtherNode() : x(0), y(0), depth(0), isRuning(1), parent(nullptr)
+EtherNode::EtherNode() : x(0), y(0), isRuning(1), parent(nullptr)
 {
+	depth = children.size();
 	//负责将该对象压入内存池
 }
 
@@ -130,8 +131,8 @@ ETHER_API node_AddChild(lua_State* L)
 ETHER_API node_EraseChild(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
-	int index = lua_tonumber(L, 2);
-	pNode->children[index - 1]->parent = nullptr;
+	int index = lua_tonumber(L, 2) - 1;
+	pNode->children[index]->parent = nullptr;
 	vector<EtherNode*>::iterator iterNode = pNode->children.begin() + index;
 	pNode->children.erase(iterNode);
 	
