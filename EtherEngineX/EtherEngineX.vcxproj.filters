@@ -39,9 +39,6 @@
     <ClCompile Include="EtherAction.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="EtherLayer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="EtherWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -72,9 +69,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="EtherAction.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="EtherLayer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="EtherWindow.h">

@@ -148,7 +148,6 @@
     <ClCompile Include="EtherAction.cpp" />
     <ClCompile Include="EtherEngineX.cpp" />
     <ClCompile Include="EtherImage.cpp" />
-    <ClCompile Include="EtherLayer.cpp" />
     <ClCompile Include="EtherModule.cpp" />
     <ClCompile Include="EtherNode.cpp" />
     <ClCompile Include="EtherSprite.cpp" />
@@ -160,7 +159,6 @@
     <ClInclude Include="EtherAction.h" />
     <ClInclude Include="EtherEngineX.h" />
     <ClInclude Include="EtherImage.h" />
-    <ClInclude Include="EtherLayer.h" />
     <ClInclude Include="EtherMacros.h" />
     <ClInclude Include="EtherModule.h" />
     <ClInclude Include="EtherNode.h" />

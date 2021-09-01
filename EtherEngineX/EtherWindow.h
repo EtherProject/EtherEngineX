@@ -2,8 +2,8 @@
 #define _WINDOW_H_
 
 #include "EtherModule.h"
+#include "EtherNode.h"
 #include "EtherUtils.h"
-#include "EtherLayer.h"
 
 #include <string>
 #include <unordered_map>
@@ -14,11 +14,22 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 
-//窗口类,拥有图层类向量(每个图层对应着一个渲染器)
+//每个图层对应着一个渲染器
+class EtherLayer : public EtherNode
+{
+public:
+	EtherLayer(SDL_Window* pWindow);
+	virtual ~EtherLayer();
+
+	SDL_Renderer* pRenderer;
+	std::vector<EtherNode*> vAllNode;
+};
+
+//每个窗口都可以拥有多个图层
 class EtherWindow
 {
 public:
-	EtherWindow(SDL_Window* _pWindow) { pWindow = _pWindow; }
+	EtherWindow(SDL_Window* _pWindow) { pWindow = _pWindow; name = nullptr; }
 
 	~EtherWindow() { SDL_DestroyWindow(pWindow); }
 
@@ -29,6 +40,7 @@ public:
 	std::vector<EtherLayer*> vLayer;
 };
 
+
 class ModuleWindow: public EtherModule
 {
 public:
@@ -38,6 +50,7 @@ private:
 	ModuleWindow();
 };
 
+//window类成员函数
 ETHER_API CreateWindow(lua_State* L);
 
 ETHER_API window_CloseWindow(lua_State* L);
@@ -69,5 +82,12 @@ ETHER_API window_SetWindowPosition(lua_State* L);
 ETHER_API window_CreateLayer(lua_State* L);
 
 ETHER_API __gc_Window(lua_State* L);
+
+//layer类成员函数
+ETHER_API layer_AddNode(lua_State* L);
+
+ETHER_API layer_EraseNode(lua_State* L);
+
+ETHER_API __gc_Layer(lua_State* L);
 
 #endif // !_WINDOW_H_
