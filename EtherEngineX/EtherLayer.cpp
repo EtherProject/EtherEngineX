@@ -8,11 +8,6 @@ ModuleLayer& ModuleLayer::Instance()
 
 ModuleLayer::ModuleLayer()
 {
-	_vCMethods =
-	{
-		{"CreateLayer", CreateLayer}
-	};
-
 	_vMetaData =
 	{
 		{
@@ -25,16 +20,14 @@ ModuleLayer::ModuleLayer()
 	};
 }
 
-ETHER_API CreateLayer(lua_State* L)
+EtherLayer::EtherLayer(SDL_Window* pWindow)
 {
-	EtherWindow* pWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
-	EtherLayer* pLayer = new EtherLayer(pWindow);
-	EtherLayer** uppLayer = (EtherLayer**)lua_newuserdata(L, sizeof(EtherLayer*));
-	*uppLayer = pLayer;
-	luaL_getmetatable(L, "EtherLayer");
-	lua_setmetatable(L, -2);
+	pRenderer = SDL_CreateRenderer(pWindow, -1, SDL_RENDERER_ACCELERATED);
+}
 
-	return 1;
+EtherLayer::~EtherLayer()
+{
+	SDL_DestroyRenderer(pRenderer);
 }
 
 ETHER_API layer_AddNode(lua_State* L)

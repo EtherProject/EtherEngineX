@@ -2,22 +2,18 @@
 #define _LAYER_H_
 
 #include "EtherNode.h"
-#include "EtherWindow.h"
 
 #include <vector>
 #include <lua.hpp>
 #include <SDL.h>
 #include <SDL_image.h>
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
-
 
 //每个图层对应着一个渲染器
 class EtherLayer : public EtherNode
 {
 public:
-	EtherLayer(EtherWindow* pWindow) { pRenderer = SDL_CreateRenderer(pWindow->pWindow, -1, SDL_RENDERER_ACCELERATED); }
-	virtual ~EtherLayer() { SDL_DestroyRenderer(pRenderer); }
+	EtherLayer(SDL_Window* pWindow);
+	virtual ~EtherLayer();
 
 	SDL_Renderer* pRenderer;
 	std::vector<EtherNode*> vAllNode;

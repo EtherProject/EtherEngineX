@@ -66,7 +66,8 @@ ModuleWindow::ModuleWindow()
 				{"GetWindowMinSize", window_GetWindowMinSize},
 				{"SetWindowMinSize", window_SetWindowMinSize},
 				{"GetWindowPosition", window_GetWindowPosition},
-				{"SetWindowPosition", window_SetWindowPosition}
+				{"SetWindowPosition", window_SetWindowPosition},
+				{"CreateLayer", window_CreateLayer}
 			},
 			__gc_Window
 		}
@@ -289,6 +290,18 @@ ETHER_API window_SetWindowPosition(lua_State* L)
 	SDL_SetWindowPosition(pEWindow->pWindow, point.x, point.y);
 
 	return 0;
+}
+
+ETHER_API window_CreateLayer(lua_State* L)
+{
+	EtherWindow* pEWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
+	EtherLayer* pLayer = new EtherLayer(pEWindow->pWindow);
+	EtherLayer** uppLayer = (EtherLayer**)lua_newuserdata(L, sizeof(EtherLayer*));
+	*uppLayer = pLayer;
+	luaL_getmetatable(L, "EtherLayer");
+	lua_setmetatable(L, -2);
+
+	return 1;
 }
 
 ETHER_API __gc_Window(lua_State* L)

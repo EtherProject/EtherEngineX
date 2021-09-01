@@ -18,8 +18,6 @@
 class EtherWindow
 {
 public:
-	EtherWindow() {}
-
 	EtherWindow(SDL_Window* _pWindow) { pWindow = _pWindow; }
 
 	~EtherWindow() { SDL_DestroyWindow(pWindow); }
@@ -67,6 +65,8 @@ ETHER_API window_SetWindowMinSize(lua_State* L);
 ETHER_API window_GetWindowPosition(lua_State* L);
 
 ETHER_API window_SetWindowPosition(lua_State* L);
+
+ETHER_API window_CreateLayer(lua_State* L);
 
 ETHER_API __gc_Window(lua_State* L);
 

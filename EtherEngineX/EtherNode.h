@@ -7,10 +7,6 @@
 
 #include <vector>
 #include <lua.hpp>
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
 
 class EtherNode
 {
@@ -28,6 +24,8 @@ public:
 	int depth;
 	//是否正在持续更新
 	bool isRuning;
+	//是否绘制出来
+	bool isShown;
 	//父节点
 	EtherNode* parent;
 	//子节点向量

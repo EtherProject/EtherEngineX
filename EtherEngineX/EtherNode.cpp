@@ -34,7 +34,7 @@ ModuleNode::ModuleNode()
 	};
 }
 
-EtherNode::EtherNode() : x(0), y(0), isRuning(1), parent(nullptr)
+EtherNode::EtherNode() : x(0), y(0), isRuning(1), isShown(1), parent(nullptr)
 {
 	depth = children.size();
 	//负责将该对象压入内存池
