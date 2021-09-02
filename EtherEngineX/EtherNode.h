@@ -18,8 +18,8 @@ public:
 	//绘制当前节点的内容
 	virtual void Draw() {}
 
-	//以父节点为基础,节点对应的坐标
-	int x, y;
+	//以父节点为基础,节点对应的矩形
+	SDL_Rect copyRect = { 0,0,0,0 };
 	//节点的z轴坐标,用于描述遮挡关系
 	int depth;
 	//是否正在持续更新

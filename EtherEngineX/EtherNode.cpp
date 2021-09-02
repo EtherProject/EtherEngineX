@@ -34,7 +34,7 @@ ModuleNode::ModuleNode()
 	};
 }
 
-EtherNode::EtherNode() : x(0), y(0), isRuning(1), isShown(1), parent(nullptr)
+EtherNode::EtherNode() : isRuning(1), isShown(1), parent(nullptr)
 {
 	depth = children.size();
 	//负责将该对象压入内存池
@@ -60,8 +60,8 @@ ETHER_API node_SetPosition(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
 	SDL_Point point = GetPointParam(L, 2);
-	pNode->x = point.x;
-	pNode->y = point.y;
+	pNode->copyRect.x = point.x;
+	pNode->copyRect.y = point.y;
 
 	return 0;
 }
@@ -71,10 +71,10 @@ ETHER_API node_GetPosition(lua_State* L)
 	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
 	lua_newtable(L);
 	lua_pushstring(L, "x");
-	lua_pushnumber(L, pNode->x);
+	lua_pushnumber(L, pNode->copyRect.x);
 	lua_settable(L, -3);
 	lua_pushstring(L, "y");
-	lua_pushnumber(L, pNode->y);
+	lua_pushnumber(L, pNode->copyRect.y);
 	lua_settable(L, -3);
 
 	return 1;
