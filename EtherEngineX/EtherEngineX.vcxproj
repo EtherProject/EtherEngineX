@@ -151,6 +151,7 @@
     <ClCompile Include="EtherModule.cpp" />
     <ClCompile Include="EtherNode.cpp" />
     <ClCompile Include="EtherSprite.cpp" />
+    <ClCompile Include="EtherTimer.cpp" />
     <ClCompile Include="EtherUtils.cpp" />
     <ClCompile Include="EtherWindow.cpp" />
   </ItemGroup>
@@ -163,6 +164,7 @@
     <ClInclude Include="EtherModule.h" />
     <ClInclude Include="EtherNode.h" />
     <ClInclude Include="EtherSprite.h" />
+    <ClInclude Include="EtherTimer.h" />
     <ClInclude Include="EtherUtils.h" />
     <ClInclude Include="EtherWindow.h" />
   </ItemGroup>

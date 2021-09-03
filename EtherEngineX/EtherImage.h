@@ -41,7 +41,7 @@ public:
 	SDL_Texture* pTexture = nullptr;
 	SDL_Renderer* pRenderer = nullptr;
 	SDL_RendererFlip mode = SDL_FLIP_NONE;
-	SDL_Rect imageRect = { 0,0,0,0 };
+	SDL_Rect imageRect;
 	SDL_Point anchorPoint = { 0,0 };
 };
 
@@ -57,6 +57,26 @@ private:
 ETHER_API LoadImageFromFile(lua_State* L);
 
 ETHER_API LoadImageFromData(lua_State* L);
+
+ETHER_API image_SetImageType(lua_State* L);
+
+ETHER_API image_SetAnchorPoint(lua_State* L);
+
+ETHER_API image_GetAnchorPoint(lua_State* L);
+
+ETHER_API image_SetRendererFlip(lua_State* L);
+
+ETHER_API image_SetImageRect(lua_State* L);
+
+ETHER_API image_GetImageRect(lua_State* L);
+
+ETHER_API image_SetCopyRect(lua_State* L);
+
+ETHER_API image_GetCopyRect(lua_State* L);
+
+ETHER_API image_SetPlaySpeed(lua_State* L);
+
+ETHER_API image_GetPlaySpeed(lua_State* L);
 
 ETHER_API image_CreateTexture(lua_State* L);
 

@@ -48,6 +48,9 @@
     <ClCompile Include="EtherImage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="EtherTimer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EtherEngineX.h">
@@ -78,6 +81,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="EtherImage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EtherTimer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -20,6 +20,7 @@ class EtherLayer : public EtherNode
 public:
 	EtherLayer(SDL_Window* pWindow);
 	virtual ~EtherLayer();
+	void Draw();
 
 	SDL_Renderer* pRenderer;
 	std::vector<EtherNode*> vAllNode;

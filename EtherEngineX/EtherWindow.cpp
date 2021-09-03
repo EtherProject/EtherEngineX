@@ -304,7 +304,7 @@ ETHER_API window_GetWindowPosition(lua_State* L)
 ETHER_API window_SetWindowPosition(lua_State* L)
 {
 	EtherWindow* pEWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
-	SDL_Point point =  GetPointParam(L, 1);
+	SDL_Point point =  GetPointParam(L, 2);
 	SDL_SetWindowPosition(pEWindow->pWindow, point.x, point.y);
 
 	return 0;
@@ -328,6 +328,13 @@ ETHER_API __gc_Window(lua_State* L)
 	delete pEWindow;
 
 	return 0;
+}
+
+void EtherLayer::Draw()
+{
+	using namespace std;
+	for (vector<EtherNode*>::iterator iter = vAllNode.begin(); iter != vAllNode.end(); iter++)
+		(*iter)->Draw();
 }
 
 ETHER_API layer_AddNode(lua_State* L)

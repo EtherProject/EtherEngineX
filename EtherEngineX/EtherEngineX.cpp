@@ -71,7 +71,8 @@ bool _LoadConfig()
 
 std::unordered_map<std::string, std::function<EtherModule*()>> _mapMoudles = {
 	{ "EtherNode", [] {return &ModuleNode::Instance(); } },
-	{ "EtherWindow",[] {return &ModuleWindow::Instance(); }}
+	{ "EtherWindow",[] {return &ModuleWindow::Instance(); }},
+	{ "EtherImage", [] {return &ModuleImage::Instance(); }}
 };
 
 ETHER_API UsingModule(lua_State* L)
@@ -152,8 +153,12 @@ int main(int argc, char** argv)
 			for (std::unordered_map<const char*, EtherWindow*>::iterator iter = mapAllWindows.begin(); iter != iterEnd; iter++)
 			{
 				std::vector<EtherLayer*> vCampLayer = (*iter).second->vLayer;
-				for (int i = vCampLayer.size() - 1; i >= 0; i--)
-					vCampLayer[i]->Draw();
+				for (std::vector<EtherLayer*>::iterator _iter = vCampLayer.begin(); _iter != vCampLayer.end(); _iter++)
+				{
+					SDL_RenderClear((*_iter)->pRenderer);
+					(*_iter)->Draw();
+					SDL_RenderPresent((*_iter)->pRenderer);
+				}
 			}
 
 			//µ÷ÓÃUpdateº¯Êý
