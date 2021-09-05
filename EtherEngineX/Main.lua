@@ -31,6 +31,7 @@ function Main.Init()
     testImage1:CreateTexture()
     testImage2:CreateTexture()
     testImage3:CreateTexture()
+    print(testImage1:GetPosition().x)
 end
 
 function Main.Update()

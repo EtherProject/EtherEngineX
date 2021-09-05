@@ -56,7 +56,7 @@ ETHER_API node_SetPosition(lua_State* L)
 
 ETHER_API node_GetPosition(lua_State* L)
 {
-	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 
 	lua_newtable(L);
 	lua_pushstring(L, "x");
@@ -71,8 +71,8 @@ ETHER_API node_GetPosition(lua_State* L)
 
 ETHER_API node_SetParent(lua_State* L)
 {
-	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
-	EtherNode* parent = (EtherNode*)(*(void**)luaL_checkudata(L, 2, "EtherNode"));
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
+	EtherNode* parent = (EtherNode*)(*(void**)lua_touserdata(L, 2));
 	pNode->parent = parent;
 	parent->children.push_back(pNode);
 
@@ -81,7 +81,7 @@ ETHER_API node_SetParent(lua_State* L)
 
 ETHER_API node_GetParent(lua_State* L)
 {
-	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	EtherNode** uppNode = (EtherNode**)lua_newuserdata(L, sizeof(EtherNode*));
 	*uppNode = pNode->parent;
 	luaL_getmetatable(L, "EtherNode");
@@ -92,7 +92,7 @@ ETHER_API node_GetParent(lua_State* L)
 
 ETHER_API node_SetDepth(lua_State* L)
 {
-	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	int depth = lua_tonumber(L, 2);
 	pNode->depth = depth;
 
@@ -101,7 +101,7 @@ ETHER_API node_SetDepth(lua_State* L)
 
 ETHER_API node_GetDepth(lua_State* L)
 {
-	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	lua_pushnumber(L, pNode->depth);
 
 	return 1;
@@ -109,8 +109,8 @@ ETHER_API node_GetDepth(lua_State* L)
 
 ETHER_API node_AddChild(lua_State* L)
 {
-	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
-	EtherNode* pChild = (EtherNode*)(*(void**)luaL_checkudata(L, 2, "EtherNode"));
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
+	EtherNode* pChild = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	pNode->children.push_back(pChild);
 	pChild->parent = pNode;
 
@@ -120,7 +120,7 @@ ETHER_API node_AddChild(lua_State* L)
 ETHER_API node_DeleteChild(lua_State* L)
 {
 	using namespace std;
-	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	int index = lua_tonumber(L, 2) - 1;
 	pNode->children[index]->parent = nullptr;
 	vector<EtherNode*>::iterator iterNode = pNode->children.begin() + index;
@@ -131,7 +131,7 @@ ETHER_API node_DeleteChild(lua_State* L)
 
 ETHER_API __gc_Node(lua_State* L)
 {
-	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	delete pNode;
 
 	return 0;
