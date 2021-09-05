@@ -4,14 +4,15 @@
 #include "EtherMacros.h"
 
 #include <lua.hpp>
-#include <string>
 #include <vector>
 
 //MetaData在lua中模拟一个类
 struct EtherMetadata
 {
 	//类名
-	std::string name;
+	const char* name;
+	//父类
+	const char* parentName;
 	//成员函数
 	std::vector<luaL_Reg> cFuns;
 	//GC函数

@@ -11,7 +11,7 @@ void EtherModule::PushMetaDataToGlobal(lua_State* L)
 	for (EtherMetadata metadata : _vMetaData)
 	{
 		//新建一个__name = metadata.name的元表并推送到交互栈中
-		luaL_newmetatable(L, metadata.name.c_str());
+		luaL_newmetatable(L, metadata.name);
 
 		//为新元表添加__index方法
 		lua_pushstring(L, "__index");
@@ -24,6 +24,11 @@ void EtherModule::PushMetaDataToGlobal(lua_State* L)
 			lua_pushcfunction(L, method.func);
 			lua_settable(L, -3);
 		}
+
+		//将新元表的父类设置为该值
+		if (metadata.parentName != nullptr)
+			luaL_setmetatable(L, metadata.parentName);
+
 		//新元表的__index方法是上面的成员函数表
 		lua_settable(L, -3);
 

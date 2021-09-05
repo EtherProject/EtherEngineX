@@ -1,7 +1,5 @@
 #include "EtherNode.h"
 
-using namespace std;
-
 ModuleNode& ModuleNode::Instance()
 {
 	static ModuleNode* _instance = new ModuleNode();
@@ -19,6 +17,7 @@ ModuleNode::ModuleNode()
 	{
 		{
 			"EtherNode",
+			nullptr,
 			{
 				{"SetPosition", node_SetPosition},
 				{"GetPosition", node_GetPosition},
@@ -27,22 +26,11 @@ ModuleNode::ModuleNode()
 				{"SetDepth", node_SetDepth},
 				{"GetDepth", node_GetDepth},
 				{"AddChild", node_AddChild},
-				{"EraseChild", node_EraseChild}
+				{"EraseChild", node_DeleteChild}
 			},
 			__gc_Node
 		}
 	};
-}
-
-EtherNode::EtherNode() : isRuning(1), isShown(1), parent(nullptr)
-{
-	depth = children.size();
-	//负责将该对象压入内存池
-}
-
-EtherNode::~EtherNode()
-{
-	// 负责将该对象从内存池里面弹出来
 }
 
 ETHER_API CreateNode(lua_State* L)
@@ -58,10 +46,10 @@ ETHER_API CreateNode(lua_State* L)
 
 ETHER_API node_SetPosition(lua_State* L)
 {
-	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
-	SDL_Point point = GetPointParam(L, 2);
-	pNode->copyRect.x = point.x;
-	pNode->copyRect.y = point.y;
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
+
+	pNode->copyRect.x = lua_tonumber(L, 2);
+	pNode->copyRect.y = lua_tonumber(L, 3);
 
 	return 0;
 }
@@ -69,6 +57,7 @@ ETHER_API node_SetPosition(lua_State* L)
 ETHER_API node_GetPosition(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
+
 	lua_newtable(L);
 	lua_pushstring(L, "x");
 	lua_pushnumber(L, pNode->copyRect.x);
@@ -128,8 +117,9 @@ ETHER_API node_AddChild(lua_State* L)
 	return 0;
 }
 
-ETHER_API node_EraseChild(lua_State* L)
+ETHER_API node_DeleteChild(lua_State* L)
 {
+	using namespace std;
 	EtherNode* pNode = (EtherNode*)(*(void**)luaL_checkudata(L, 1, "EtherNode"));
 	int index = lua_tonumber(L, 2) - 1;
 	pNode->children[index]->parent = nullptr;

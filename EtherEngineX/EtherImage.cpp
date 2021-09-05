@@ -8,6 +8,9 @@ ModuleImage& ModuleImage::Instance()
 
 ModuleImage::ModuleImage()
 {
+	TTF_Init();
+	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
+
 	_vCMethods =
 	{
 		{"LoadImageFromFile", LoadImageFromFile},
@@ -25,23 +28,29 @@ ModuleImage::ModuleImage()
 	{
 		{
 			"EtherImage",
+			"EtherNode",
 			{
 				{"CreateTexture", image_CreateTexture},
-				{"ReleaseTexture", image_ReleaseTexture},
+				{"ReleaseTexture", image_DeleteTexture},
 				{"SetImageType", image_SetImageType},
 				{"SetAnchorPoint", image_SetAnchorPoint},
 				{"GetAnchorPoint", image_GetAnchorPoint},
 				{"SetRendererFlip", image_SetRendererFlip},
 				{"SetImageRect", image_SetImageRect},
 				{"GetImageRect", image_GetImageRect},
-				{"SetCopyRect", image_SetCopyRect},
-				{"GetCopyRect", image_GetCopyRect},
+				{"SetSize", image_SetSize},
+				{"GetSize", image_GetSize},
 				{"SetPlaySpeed", image_SetPlaySpeed},
 				{"GetPlaySpeed", image_GetPlaySpeed}
 			},
 			__gc_Image
 		}
 	};
+}
+
+EtherImage::EtherImage()
+{
+	type = NodeType::Image;
 }
 
 EtherImage::~EtherImage()
@@ -66,6 +75,8 @@ void EtherImage::Draw()
 				SDL_RenderCopyEx(pRenderer, pTexture, &imageRect, &copyRect, angle, &anchorPoint, mode);
 				currentFrame = (currentFrame + 1) % frameAmount;
 			}
+			else
+				SDL_RenderCopyEx(pRenderer, pTexture, &imageRect, &copyRect, angle, &anchorPoint, mode);
 		}
 		else
 			SDL_RenderCopyEx(pRenderer, pTexture, &imageRect, &copyRect, angle, &anchorPoint, mode);
@@ -83,6 +94,8 @@ void EtherImage::Draw()
 				SDL_RenderCopy(pRenderer, pTexture, &imageRect, &copyRect);
 				currentFrame = (currentFrame + 1) % frameAmount;
 			}
+			else
+				SDL_RenderCopy(pRenderer, pTexture, &imageRect, &copyRect);
 		}
 		else
 			SDL_RenderCopy(pRenderer, pTexture, &imageRect, &copyRect);
@@ -229,35 +242,24 @@ ETHER_API image_GetImageRect(lua_State* L)
 	return 1;
 }
 
-ETHER_API image_SetCopyRect(lua_State* L)
+ETHER_API image_SetSize(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
-	SDL_Rect rect = GetRectParam(L, 2);
 
-	pImage->copyRect = rect;
+	pImage->copyRect.w = lua_tonumber(L, 2);
+	pImage->copyRect.h = lua_tonumber(L, 3);
 
 	return 0;
 }
 
-ETHER_API image_GetCopyRect(lua_State* L)
+ETHER_API image_GetSize(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
 
-	lua_newtable(L);
-	lua_pushstring(L, "x");
-	lua_pushnumber(L, pImage->copyRect.x);
-	lua_settable(L, -3);
-	lua_pushstring(L, "y");
-	lua_pushnumber(L, pImage->copyRect.y);
-	lua_settable(L, -3);
-	lua_pushstring(L, "w");
 	lua_pushnumber(L, pImage->copyRect.w);
-	lua_settable(L, -3);
-	lua_pushstring(L, "h");
 	lua_pushnumber(L, pImage->copyRect.h);
-	lua_settable(L, -3);
 
-	return 1;
+	return 2;
 }
 
 ETHER_API image_SetPlaySpeed(lua_State* L)
@@ -280,15 +282,15 @@ ETHER_API image_GetPlaySpeed(lua_State* L)
 ETHER_API image_CreateTexture(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
-	EtherLayer* pLayer = (EtherLayer*)(*(void**)luaL_checkudata(L, 2, "EtherLayer"));
-	pImage->pTexture = SDL_CreateTextureFromSurface(pLayer->pRenderer, pImage->pSurface);
-	pImage->pRenderer = pLayer->pRenderer;
+	if(pImage->pRenderer == nullptr)
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Error occured: ", "Texture can't be created until this image is added to the layer!", nullptr);
+	pImage->pTexture = SDL_CreateTextureFromSurface(pImage->pRenderer, pImage->pSurface);
 	pImage->isOpened = true;
 
 	return 0;
 }
 
-ETHER_API image_ReleaseTexture(lua_State* L)
+ETHER_API image_DeleteTexture(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
 	SDL_DestroyTexture(pImage->pTexture);

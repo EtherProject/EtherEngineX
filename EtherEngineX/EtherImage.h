@@ -4,20 +4,17 @@
 #include "EtherWindow.h"
 #include "EtherModule.h"
 
-#include <lua.hpp>
-#include <SDL.h>
 #include <SDL_image.h>
-#include <SDL_mixer.h>
 #include <SDL_ttf.h>
 
 class EtherImage: public EtherNode
 {
 public:
-	EtherImage() {}
+	EtherImage();
 
 	~EtherImage();
 
-	void Draw();
+	virtual void Draw();
 
 	bool isRotated = false;
 	bool isDynamic = false;
@@ -39,9 +36,8 @@ public:
 
 	SDL_Surface* pSurface = nullptr;
 	SDL_Texture* pTexture = nullptr;
-	SDL_Renderer* pRenderer = nullptr;
 	SDL_RendererFlip mode = SDL_FLIP_NONE;
-	SDL_Rect imageRect;
+	SDL_Rect imageRect = { 0,0,0,0 };
 	SDL_Point anchorPoint = { 0,0 };
 };
 
@@ -70,9 +66,9 @@ ETHER_API image_SetImageRect(lua_State* L);
 
 ETHER_API image_GetImageRect(lua_State* L);
 
-ETHER_API image_SetCopyRect(lua_State* L);
+ETHER_API image_SetSize(lua_State* L);
 
-ETHER_API image_GetCopyRect(lua_State* L);
+ETHER_API image_GetSize(lua_State* L);
 
 ETHER_API image_SetPlaySpeed(lua_State* L);
 
@@ -80,7 +76,7 @@ ETHER_API image_GetPlaySpeed(lua_State* L);
 
 ETHER_API image_CreateTexture(lua_State* L);
 
-ETHER_API image_ReleaseTexture(lua_State* L);
+ETHER_API image_DeleteTexture(lua_State* L);
 
 ETHER_API __gc_Image(lua_State* L);
 

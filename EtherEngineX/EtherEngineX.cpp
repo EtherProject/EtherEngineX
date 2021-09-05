@@ -109,6 +109,8 @@ int main(int argc, char** argv)
 {
 	//SDL初始化
 	SDL_Init(SDL_INIT_EVERYTHING);
+	//SDL设置抗锯齿
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
 	//lua启动所有标准库
 	luaL_openlibs(EtherEngineX::pLState);
 	//设置垃圾回收数值
@@ -147,6 +149,12 @@ int main(int argc, char** argv)
 		while (sceneIndex == EtherEngineX::Continue)
 		{
 			unsigned int timeFrameStart = SDL_GetTicks();
+
+			//事件获取
+			while (SDL_PollEvent(&EtherEngineX::event))
+			{
+
+			}
 
 			//将画面绘制出来
 			std::unordered_map<const char*, EtherWindow*>::iterator iterEnd = mapAllWindows.end();
