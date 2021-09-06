@@ -27,7 +27,9 @@ public:
 	//绘制当前节点的内容
 	virtual void Draw() {}
 
-	//以父节点为基础,节点对应的矩形
+	//以父节点左上角的坐标作为参考,该节点的坐标
+	SDL_Rect relativeRect = { 0,0,0,0 };
+	//节点对应的世界坐标
 	SDL_Rect copyRect = { 0,0,0,0 };
 	//节点的z轴坐标,用于描述遮挡关系
 	int depth = -1;

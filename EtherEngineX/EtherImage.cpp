@@ -62,6 +62,7 @@ EtherImage::~EtherImage()
 void EtherImage::Draw()
 {
 	using namespace std;
+
 	if (isRotated)
 	{
 		if (isDynamic)
@@ -150,6 +151,13 @@ ETHER_API image_SetImageType(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
 	pImage->isDynamic = lua_toboolean(L, 2);
+
+	if (pImage->isDynamic)
+	{
+		//如果是动图则需要自己告诉程序一共有多少帧
+		pImage->frameAmount = lua_tonumber(L, 3);
+		pImage->xAmount = pImage->pSurface->w / pImage->imageRect.w;
+	}
 
 	return 0;
 }

@@ -27,7 +27,7 @@ public:
 	unsigned short frameAmount = 0;
 	//动图的播放速度(帧/一次)
 	unsigned short playSpeed = 0;
-	//当前帧(底层从0开始,lua层从1开始)
+	//当前帧
 	unsigned short currentFrame = 0;
 	//动图开始播放的时间(用于计算切换下一帧是什么时候)
 	unsigned int imageFrameStart = SDL_GetTicks();
