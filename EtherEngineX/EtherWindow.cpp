@@ -86,16 +86,6 @@ ModuleWindow::ModuleWindow()
 	};
 }
 
-EtherLayer::EtherLayer(SDL_Window* pWindow)
-{
-	pRenderer = SDL_CreateRenderer(pWindow, -1, SDL_RENDERER_ACCELERATED);
-}
-
-EtherLayer::~EtherLayer()
-{
-	SDL_DestroyRenderer(pRenderer);
-}
-
 ModuleWindow& ModuleWindow::Instance()
 {
 	static ModuleWindow* _instance = new ModuleWindow();
@@ -146,6 +136,7 @@ ETHER_API CreateWindow(lua_State* L)
 	const char* strName = luaL_checkstring(L, 1);
 	EtherWindow* pEWindow = new EtherWindow(SDL_CreateWindow(strName, rect.x, rect.y, rect.w, rect.h, flags));
 	pEWindow->name = strName;
+	pEWindow->pRenderer = SDL_CreateRenderer(pEWindow->pWindow, -1, SDL_RENDERER_ACCELERATED);
 
 	//给全局窗口表推送一个
 	mapAllWindows[strName] = pEWindow;
@@ -317,12 +308,14 @@ ETHER_API window_SetWindowPosition(lua_State* L)
 ETHER_API window_CreateLayer(lua_State* L)
 {
 	EtherWindow* pEWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
-	EtherLayer* pLayer = new EtherLayer(pEWindow->pWindow);
-	EtherLayer** uppLayer = (EtherLayer**)lua_newuserdata(L, sizeof(EtherLayer*));
-	*uppLayer = pLayer;
+
+	EtherLayer* pLayer = new EtherLayer();
+	pLayer->pRenderer = pEWindow->pRenderer;
 
 	pEWindow->vLayer.push_back(pLayer);
 
+	EtherLayer** uppLayer = (EtherLayer**)lua_newuserdata(L, sizeof(EtherLayer*));
+	*uppLayer = pLayer;
 	luaL_getmetatable(L, "EtherLayer");
 	lua_setmetatable(L, -2);
 
@@ -333,9 +326,11 @@ ETHER_API window_DeleteLayer(lua_State* L)
 {
 	using namespace std;
 	EtherWindow* pEWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
+
 	int index = lua_tonumber(L, 2) - 1;
-	vector<EtherLayer*>::iterator iterNode = pEWindow->vLayer.begin() + index;
-	pEWindow->vLayer.erase(iterNode);
+	delete pEWindow->vLayer[index];
+	vector<EtherLayer*>::iterator iterLayer = pEWindow->vLayer.begin() + index;
+	pEWindow->vLayer.erase(iterLayer);
 
 	return 0;
 
@@ -354,7 +349,8 @@ void EtherLayer::Draw()
 	using namespace std;
 	unsigned int size = children.size();
 	for (unsigned int i = 0; i < size; i++)
-		children[i]->Draw();
+		if (children[i]->isShown)
+			children[i]->Draw();
 }
 
 ETHER_API layer_AddNode(lua_State* L)
@@ -363,6 +359,7 @@ ETHER_API layer_AddNode(lua_State* L)
 	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 2));
 
 	pNode->pRenderer = pLayer->pRenderer;
+
 	pLayer->children.push_back(pNode);
 
 	return 0;
@@ -372,8 +369,8 @@ ETHER_API layer_DeleteNode(lua_State* L)
 {
 	using namespace std;
 	EtherLayer* pLayer = (EtherLayer*)(*(void**)luaL_checkudata(L, 1, "EtherLayer"));
+
 	int index = lua_tonumber(L, 2) - 1;
-	pLayer->children[index]->pRenderer = nullptr;
 	vector<EtherNode*>::iterator iterNode = pLayer->children.begin() + index;
 	pLayer->children.erase(iterNode);
 

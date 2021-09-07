@@ -163,9 +163,9 @@ int main(int argc, char** argv)
 				std::vector<EtherLayer*> vCampLayer = (*iter).second->vLayer;
 				for (std::vector<EtherLayer*>::iterator _iter = vCampLayer.begin(); _iter != vCampLayer.end(); _iter++)
 				{
-					SDL_RenderClear((*_iter)->pRenderer);
+					SDL_RenderClear((*iter).second->pRenderer);
 					(*_iter)->Draw();
-					SDL_RenderPresent((*_iter)->pRenderer);
+					SDL_RenderPresent((*iter).second->pRenderer);
 				}
 			}
 

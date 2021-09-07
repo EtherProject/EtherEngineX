@@ -9,13 +9,12 @@
 #include <unordered_map>
 #include <vector>
 
-//每个图层对应着一个渲染器
 class EtherLayer
 {
 public:
-	EtherLayer(SDL_Window* pWindow);
+	EtherLayer() {}
 
-	~EtherLayer();
+	~EtherLayer() {}
 
 	void Draw();
 
@@ -24,7 +23,6 @@ public:
 	std::vector<EtherNode*> children;
 };
 
-//每个窗口都可以拥有多个图层
 class EtherWindow
 {
 public:
@@ -33,6 +31,8 @@ public:
 	~EtherWindow() { SDL_DestroyWindow(pWindow); }
 
 	SDL_Window* pWindow = nullptr;
+
+	SDL_Renderer* pRenderer = nullptr;
 
 	const char* name;
 

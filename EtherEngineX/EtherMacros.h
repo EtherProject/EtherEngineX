@@ -11,4 +11,10 @@ struct EtherMacro
 	int value;
 };
 
+typedef struct SDL_Size
+{
+	int w;
+	int h;
+} SDL_Size;
+
 #endif // !_MACROS_H_

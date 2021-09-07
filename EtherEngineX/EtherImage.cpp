@@ -28,29 +28,20 @@ ModuleImage::ModuleImage()
 	{
 		{
 			"EtherImage",
-			"EtherNode",
+			nullptr,
 			{
-				{"CreateTexture", image_CreateTexture},
-				{"ReleaseTexture", image_DeleteTexture},
 				{"SetImageType", image_SetImageType},
+				{"SetRendererFlip", image_SetRendererFlip},
 				{"SetAnchorPoint", image_SetAnchorPoint},
 				{"GetAnchorPoint", image_GetAnchorPoint},
-				{"SetRendererFlip", image_SetRendererFlip},
 				{"SetImageRect", image_SetImageRect},
 				{"GetImageRect", image_GetImageRect},
-				{"SetSize", image_SetSize},
-				{"GetSize", image_GetSize},
 				{"SetPlaySpeed", image_SetPlaySpeed},
-				{"GetPlaySpeed", image_GetPlaySpeed}
+				{"GetPlaySpeed", image_GetPlaySpeed},
 			},
 			__gc_Image
 		}
 	};
-}
-
-EtherImage::EtherImage()
-{
-	type = NodeType::Image;
 }
 
 EtherImage::~EtherImage()
@@ -58,65 +49,17 @@ EtherImage::~EtherImage()
 	if (isOpened) SDL_DestroyTexture(pTexture);
 }
 
-//这里应当再实现子节点随父节点的移动而移动
-void EtherImage::Draw()
-{
-	using namespace std;
-
-	if (isRotated)
-	{
-		if (isDynamic)
-		{
-			imageFrameEnd = SDL_GetTicks();
-			if ((imageFrameEnd - imageFrameStart) / 60 >= playSpeed)
-			{
-				imageFrameStart = imageFrameEnd;
-				imageRect.x = (currentFrame % xAmount) * imageRect.w;
-				imageRect.y = (currentFrame / xAmount) * imageRect.h;
-				SDL_RenderCopyEx(pRenderer, pTexture, &imageRect, &copyRect, angle, &anchorPoint, mode);
-				currentFrame = (currentFrame + 1) % frameAmount;
-			}
-			else
-				SDL_RenderCopyEx(pRenderer, pTexture, &imageRect, &copyRect, angle, &anchorPoint, mode);
-		}
-		else
-			SDL_RenderCopyEx(pRenderer, pTexture, &imageRect, &copyRect, angle, &anchorPoint, mode);
-	}
-	else
-	{
-		if (isDynamic)
-		{
-			imageFrameEnd = SDL_GetTicks();
-			if ((imageFrameEnd - imageFrameStart) / 60 >= playSpeed)
-			{
-				imageFrameStart = imageFrameEnd;
-				imageRect.x = (currentFrame % xAmount) * imageRect.w;
-				imageRect.y = (currentFrame / xAmount) * imageRect.h;
-				SDL_RenderCopy(pRenderer, pTexture, &imageRect, &copyRect);
-				currentFrame = (currentFrame + 1) % frameAmount;
-			}
-			else
-				SDL_RenderCopy(pRenderer, pTexture, &imageRect, &copyRect);
-		}
-		else
-			SDL_RenderCopy(pRenderer, pTexture, &imageRect, &copyRect);
-	}
-	if (!children.empty())
-		for (vector<EtherNode*>::iterator iter = children.begin(); iter != children.end(); iter++)
-			(*iter)->Draw();
-}
-
 ETHER_API LoadImageFromFile(lua_State* L)
 {
 	EtherImage* pImage = new EtherImage();
 
 	pImage->pSurface = IMG_Load(luaL_checkstring(L, 1));
-	luaL_argcheck(L, pImage->pSurface, 1, "load image from file failed");
+	luaL_argcheck(L, pImage->pSurface, 1, "load image from data failed");
 
-	pImage->imageRect.x = 0; pImage->imageRect.y = 0;
-	pImage->imageRect.w = pImage->pSurface->w; pImage->imageRect.h = pImage->pSurface->h;
-	pImage->copyRect.x = 0; pImage->copyRect.y = 0;
-	pImage->imageRect.w = pImage->pSurface->w; pImage->imageRect.h = pImage->pSurface->h;
+	pImage->imageRect.x = 0;
+	pImage->imageRect.y = 0;
+	pImage->imageRect.w = pImage->pSurface->w;
+	pImage->imageRect.h = pImage->pSurface->h;
 
 	EtherImage** uppImage = (EtherImage**)lua_newuserdata(L, sizeof(EtherImage*));
 	*uppImage = pImage;
@@ -134,10 +77,10 @@ ETHER_API LoadImageFromData(lua_State* L)
 	pImage->pSurface = IMG_Load_RW(SDL_RWFromMem((void*)luaL_checklstring(L, 1, &size), size), 1);
 	luaL_argcheck(L, pImage->pSurface, 1, "load image from data failed");
 
-	pImage->imageRect.x = 0; pImage->imageRect.y = 0;
-	pImage->imageRect.w = pImage->pSurface->w; pImage->imageRect.h = pImage->pSurface->h;
-	pImage->copyRect.x = 0; pImage->copyRect.y = 0;
-	pImage->imageRect.w = pImage->pSurface->w; pImage->imageRect.h = pImage->pSurface->h;
+	pImage->imageRect.x = 0;
+	pImage->imageRect.y = 0;
+	pImage->imageRect.w = pImage->pSurface->w;
+	pImage->imageRect.h = pImage->pSurface->h;
 
 	EtherImage** uppImage = (EtherImage**)lua_newuserdata(L, sizeof(EtherImage*));
 	*uppImage = pImage;
@@ -154,9 +97,17 @@ ETHER_API image_SetImageType(lua_State* L)
 
 	if (pImage->isDynamic)
 	{
-		//如果是动图则需要自己告诉程序一共有多少帧
-		pImage->frameAmount = lua_tonumber(L, 3);
-		pImage->xAmount = pImage->pSurface->w / pImage->imageRect.w;
+		if (lua_isnumber(L, 3))
+		{
+			//如果是动图则需要自己告诉程序一共有多少帧
+			pImage->frameAmount = lua_tonumber(L, 3);
+			pImage->xAmount = pImage->pSurface->w / pImage->imageRect.w;
+		}
+		else
+		{
+			pImage->isDynamic = false;
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Error Occured:", "The frame's amount must be a number!", nullptr);
+		}
 	}
 
 	return 0;
@@ -174,6 +125,7 @@ ETHER_API image_SetAnchorPoint(lua_State* L)
 ETHER_API image_GetAnchorPoint(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+
 	lua_newtable(L);
 	lua_pushstring(L, "x");
 	lua_pushnumber(L, pImage->anchorPoint.x);
@@ -250,26 +202,6 @@ ETHER_API image_GetImageRect(lua_State* L)
 	return 1;
 }
 
-ETHER_API image_SetSize(lua_State* L)
-{
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
-
-	pImage->copyRect.w = lua_tonumber(L, 2);
-	pImage->copyRect.h = lua_tonumber(L, 3);
-
-	return 0;
-}
-
-ETHER_API image_GetSize(lua_State* L)
-{
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
-
-	lua_pushnumber(L, pImage->copyRect.w);
-	lua_pushnumber(L, pImage->copyRect.h);
-
-	return 2;
-}
-
 ETHER_API image_SetPlaySpeed(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
@@ -285,26 +217,6 @@ ETHER_API image_GetPlaySpeed(lua_State* L)
 	lua_pushnumber(L, pImage->playSpeed);
 
 	return 1;
-}
-
-ETHER_API image_CreateTexture(lua_State* L)
-{
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
-	if(pImage->pRenderer == nullptr)
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Error occured: ", "Texture can't be created until this image is added to the layer!", nullptr);
-	pImage->pTexture = SDL_CreateTextureFromSurface(pImage->pRenderer, pImage->pSurface);
-	pImage->isOpened = true;
-
-	return 0;
-}
-
-ETHER_API image_DeleteTexture(lua_State* L)
-{
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
-	SDL_DestroyTexture(pImage->pTexture);
-	pImage->isOpened = false;
-
-	return 0;
 }
 
 ETHER_API __gc_Image(lua_State* L)

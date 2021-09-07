@@ -6,9 +6,8 @@
 class EtherSprite
 {
 public:
-	unsigned int curretImage;
+	unsigned int imageIndex;
 	std::vector<EtherImage*> vImage;
-
 };
 
 class ModuleSprite : public EtherModule
