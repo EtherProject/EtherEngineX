@@ -349,7 +349,7 @@ void EtherLayer::Draw()
 	using namespace std;
 	unsigned int size = children.size();
 	for (unsigned int i = 0; i < size; i++)
-		if (children[i]->isShown)
+		if (children[i]->isShown && children[i]->pImage != nullptr)
 			children[i]->Draw();
 }
 

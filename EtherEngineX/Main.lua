@@ -12,6 +12,7 @@ function Main.Init()
     print("Here are Main.Init()")
     layer:AddNode(node)
     node:SetImage(image)
+    image:SetImageDynamic(true, 4, 100, 100)
     node:SetCopyRect({x = 0, y = 0, w = 200, h = 200})
 end
 

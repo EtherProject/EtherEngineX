@@ -111,10 +111,21 @@ ETHER_API node_SetImage(lua_State* L)
 	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 2, "EtherImage"));
 
-	pImage->pTexture = SDL_CreateTextureFromSurface(pNode->pRenderer, pImage->pSurface);
-	pImage->isOpened = true;
-
-	pNode->pImage = pImage;
+	if (pImage != nullptr && pNode->pImage != pImage)
+	{
+		if (!pImage->isOpened)
+		{
+			pImage->pTexture = SDL_CreateTextureFromSurface(pNode->pRenderer, pImage->pSurface);
+			pImage->isOpened = true;
+		}
+		pNode->pImage = pImage;
+	}
+	else
+	{
+		if (pNode->pImage->isOpened)
+			SDL_DestroyTexture(pNode->pImage->pTexture);
+		pNode->pImage = nullptr;
+	}
 
 	return 0;
 }

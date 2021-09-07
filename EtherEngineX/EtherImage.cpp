@@ -30,7 +30,7 @@ ModuleImage::ModuleImage()
 			"EtherImage",
 			nullptr,
 			{
-				{"SetImageType", image_SetImageType},
+				{"SetImageDynamic", image_SetImageDynamic},
 				{"SetRendererFlip", image_SetRendererFlip},
 				{"SetAnchorPoint", image_SetAnchorPoint},
 				{"GetAnchorPoint", image_GetAnchorPoint},
@@ -90,7 +90,7 @@ ETHER_API LoadImageFromData(lua_State* L)
 	return 1;
 }
 
-ETHER_API image_SetImageType(lua_State* L)
+ETHER_API image_SetImageDynamic(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
 	pImage->isDynamic = lua_toboolean(L, 2);
@@ -100,7 +100,10 @@ ETHER_API image_SetImageType(lua_State* L)
 		if (lua_isnumber(L, 3))
 		{
 			//如果是动图则需要自己告诉程序一共有多少帧
+			//以及动图每帧图片的大小
 			pImage->frameAmount = lua_tonumber(L, 3);
+			pImage->imageRect.w = lua_tonumber(L, 4);
+			pImage->imageRect.h = lua_tonumber(L, 5);
 			pImage->xAmount = pImage->pSurface->w / pImage->imageRect.w;
 		}
 		else
@@ -109,7 +112,6 @@ ETHER_API image_SetImageType(lua_State* L)
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Error Occured:", "The frame's amount must be a number!", nullptr);
 		}
 	}
-
 	return 0;
 }
 
@@ -175,6 +177,7 @@ ETHER_API image_SetRendererFlip(lua_State* L)
 ETHER_API image_SetImageRect(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+
 	SDL_Rect reshapeRect = GetRectParam(L, 2);
 	pImage->imageRect = reshapeRect;
 
