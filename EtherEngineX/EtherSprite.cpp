@@ -52,7 +52,7 @@ ETHER_API sprite_ChangeImage(lua_State* L)
 ETHER_API sprite_AddImage(lua_State* L)
 {
 	EtherSprite* pSprite = (EtherSprite*)(*(void**)luaL_checkudata(L, 1, "EtherSprite"));
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 2, "EtherImage"));
 
 	if (!pImage->isOpened)
 	{

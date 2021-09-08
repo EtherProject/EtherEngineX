@@ -69,6 +69,10 @@ ETHER_API image_SetPlaySpeed(lua_State* L);
 
 ETHER_API image_GetPlaySpeed(lua_State* L);
 
+ETHER_API image_SetCurrentFrame(lua_State* L);
+
+ETHER_API image_GetCurrentFrame(lua_State* L);
+
 ETHER_API __gc_Image(lua_State* L);
 
 #endif // !_IMAGE_H_

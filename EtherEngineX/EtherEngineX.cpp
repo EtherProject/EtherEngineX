@@ -70,9 +70,10 @@ bool _LoadConfig()
 }
 
 std::unordered_map<std::string, std::function<EtherModule*()>> _mapMoudles = {
-	{ "EtherNode", [] {return &ModuleNode::Instance(); } },
 	{ "EtherWindow",[] {return &ModuleWindow::Instance(); }},
-	{ "EtherImage", [] {return &ModuleImage::Instance(); }}
+	{ "EtherImage", [] {return &ModuleImage::Instance(); }},
+	{ "EtherNode", [] {return &ModuleNode::Instance(); } },
+	{ "EtherSprite", [] {return &ModuleSprite::Instance(); }}
 };
 
 ETHER_API UsingModule(lua_State* L)

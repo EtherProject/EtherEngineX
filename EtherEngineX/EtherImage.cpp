@@ -38,6 +38,8 @@ ModuleImage::ModuleImage()
 				{"GetImageRect", image_GetImageRect},
 				{"SetPlaySpeed", image_SetPlaySpeed},
 				{"GetPlaySpeed", image_GetPlaySpeed},
+				{"SetCurrentFrame", image_SetCurrentFrame},
+				{"GetCurrentFrame", image_GetCurrentFrame}
 			},
 			__gc_Image
 		}
@@ -218,6 +220,32 @@ ETHER_API image_GetPlaySpeed(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
 	lua_pushnumber(L, pImage->playSpeed);
+
+	return 1;
+}
+
+ETHER_API image_SetCurrentFrame(lua_State* L)
+{
+	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	if (pImage->isDynamic)
+	{
+		pImage->currentFrame = lua_tonumber(L, 2);
+		pImage->imageRect.x = (pImage->currentFrame % pImage->xAmount) * pImage->imageRect.w;
+		pImage->imageRect.y = (pImage->currentFrame / pImage->xAmount) * pImage->imageRect.h;
+	}
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Frame Failed", "You can't set frame for a static image", nullptr);
+
+	return 0;
+}
+
+ETHER_API image_GetCurrentFrame(lua_State* L)
+{
+	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	if (pImage->isDynamic)
+		lua_pushnumber(L, pImage->currentFrame);
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Get Frame Failed", "You can't get frame from a static image", nullptr);
 
 	return 1;
 }
