@@ -6,7 +6,6 @@
 
 #include <vector>
 #include <lua.hpp>
-#include <functional>
 
 class EtherNode
 {
@@ -71,6 +70,8 @@ ETHER_API node_SetCopyRect(lua_State* L);
 
 ETHER_API node_GetCopyRect(lua_State* L);
 
+ETHER_API node_SetAlpha(lua_State* L);
+
 ETHER_API node_SetParent(lua_State* L);
 
 ETHER_API node_GetParent(lua_State* L);
@@ -84,6 +85,8 @@ ETHER_API node_AddChild(lua_State* L);
 ETHER_API node_DeleteChild(lua_State* L);
 
 ETHER_API node_RunAction(lua_State* L);
+
+ETHER_API node_SetPause(lua_State* L);
 
 ETHER_API __gc_Node(lua_State* L);
 

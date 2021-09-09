@@ -11,7 +11,8 @@ ModuleAction::ModuleAction()
 	_vCMethods =
 	{
 		{"CreateMoveTo", CreateMoveTo},
-		{"CreateMoveBy", CreateMoveBy}
+		{"CreateMoveBy", CreateMoveBy},
+		{"CreateSpinBy", CreateSpinBy}
 	};
 
 	_vMetaData =
@@ -20,8 +21,7 @@ ModuleAction::ModuleAction()
 			"EtherAction",
 			nullptr,
 			{
-				{},
-				{}
+				{"ModifyTime", action_ModifyTime}
 			},
 			__gc_Action
 		}
@@ -42,6 +42,20 @@ MoveBy::MoveBy(SDL_FPoint point, unsigned int time)
 	type = ACTION_TYPE::MOVEBY;
 }
 
+SpinBy::SpinBy(double angle, unsigned int time)
+{
+	mAngle = angle;
+	last = time * ETHER_FRAME;
+	type = ACTION_TYPE::SPINBY;
+}
+
+FadeTo::FadeTo(short alhpa, unsigned int time)
+{
+	mAlpha = alhpa;
+	last = time * ETHER_FRAME;
+	type = ACTION_TYPE::FADETO;
+}
+
 ETHER_API CreateMoveTo(lua_State* L)
 {
 
@@ -56,13 +70,44 @@ ETHER_API CreateMoveTo(lua_State* L)
 
 ETHER_API CreateMoveBy(lua_State* L)
 {
-	MoveTo* pAction = new MoveTo(GetFPointParam(L, 1), lua_tonumber(L, 2));
+	MoveBy* pAction = new MoveBy(GetFPointParam(L, 1), lua_tonumber(L, 2));
 	EtherAction** uppAction = (EtherAction**)lua_newuserdata(L, sizeof(EtherAction*));
 	*uppAction = pAction;
 	luaL_getmetatable(L, "EtherAction");
 	lua_setmetatable(L, -2);
 
 	return 1;
+}
+
+ETHER_API CreateSpinBy(lua_State* L)
+{
+	SpinBy* pAction = new SpinBy(lua_tonumber(L, 1), lua_tonumber(L, 2));
+	EtherAction** uppAction = (EtherAction**)lua_newuserdata(L, sizeof(EtherAction*));
+	*uppAction = pAction;
+	luaL_getmetatable(L, "EtherAction");
+	lua_setmetatable(L, -2);
+
+	return 1;
+}
+
+ETHER_API CreateFadeTo(lua_State* L)
+{
+	FadeTo* pAction = new FadeTo(lua_tonumber(L, 1), lua_tonumber(L, 2));
+
+	EtherAction** uppAction = (EtherAction**)lua_newuserdata(L, sizeof(EtherAction*));
+	*uppAction = pAction;
+	luaL_getmetatable(L, "EtherAction");
+	lua_setmetatable(L, -2);
+
+	return 1;
+}
+
+ETHER_API action_ModifyTime(lua_State* L)
+{
+	EtherAction* pAction = (EtherAction*)(*(void**)lua_touserdata(L, 1));
+	pAction->last = lua_tonumber(L, 2) * 60;
+
+	return 0;
 }
 
 ETHER_API __gc_Action(lua_State* L)

@@ -202,7 +202,7 @@ int main(int argc, char** argv)
 						{
 							(*iterA)->progress = 0;
 							(*iterA)->stop(EtherEngineX::pLState);
-							iterA++;
+							(*iter)->index++;
 						}
 					}
 					else

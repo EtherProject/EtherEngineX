@@ -6,16 +6,31 @@ std::vector<EtherNodeAction*> vAction;
 //各个动作对应的function
 std::unordered_map<ACTION_TYPE, std::function<void(EtherNode*, EtherAction*)> > mapFunction =
 {
-	{ACTION_TYPE::MOVEBY, [](EtherNode* pNode, EtherAction* pAction) ->void 
+	{ACTION_TYPE::MOVEBY, [](EtherNode* pNode, EtherAction* pAction) ->void
 		{
-			pNode->copyRect.x += pAction->mPoint.x / ETHER_FRAME;
-			pNode->copyRect.y += pAction->mPoint.y / ETHER_FRAME;
+			pNode->copyRect.x += pAction->mPoint.x / pAction->last;
+			pNode->copyRect.y += pAction->mPoint.y / pAction->last;
 		}
 	},
+
 	{ACTION_TYPE::MOVETO, [](EtherNode* pNode, EtherAction* pAction) ->void
 		{
-			pNode->copyRect.x += (pAction->mPoint.x - pNode->worldCopyRect.x) / ETHER_FRAME;
-			pNode->copyRect.y += (pAction->mPoint.y - pNode->worldCopyRect.y) / ETHER_FRAME;
+			pNode->copyRect.x += (pAction->mPoint.x - pNode->copyRect.x) / pAction->last;
+			pNode->copyRect.y += (pAction->mPoint.y - pNode->copyRect.y) / pAction->last;
+		}
+	},
+
+	{ACTION_TYPE::SPINBY, [](EtherNode* pNode, EtherAction* pAction) ->void
+		{
+			pNode->pImage->isRotated = true;
+			pNode->pImage->angle += pAction->mAngle / pAction->last;
+		}
+	},
+
+	{ACTION_TYPE::FADETO, [](EtherNode* pNode, EtherAction* pAction) ->void
+		{
+			SDL_SetTextureBlendMode(pNode->pImage->pTexture, SDL_BLENDMODE_BLEND);
+			SDL_SetTextureAlphaMod(pNode->pImage->pTexture, pAction->mAlpha / pAction->last);
 		}
 	}
 };
@@ -43,13 +58,15 @@ ModuleNode::ModuleNode()
 				{"GetImage", node_GetImage},
 				{"SetCopyRect", node_SetCopyRect},
 				{"GetCopyRect", node_GetCopyRect},
+				{"SetAlpha", node_SetAlpha},
 				{"SetParent", node_SetParent},
 				{"GetParent", node_GetParent},
 				{"SetDepth", node_SetDepth},
 				{"GetDepth", node_GetDepth},
 				{"AddChild", node_AddChild},
 				{"DeleteChild", node_DeleteChild},
-				{"RunAction", node_RunAction}
+				{"RunAction", node_RunAction},
+				{"SetPause", node_SetPause}
 			},
 			__gc_Node
 		}
@@ -223,6 +240,20 @@ ETHER_API node_GetParent(lua_State* L)
 	return 1;
 }
 
+ETHER_API node_SetAlpha(lua_State* L)
+{
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
+	if (pNode->pImage->isOpened)
+	{
+		SDL_SetTextureBlendMode(pNode->pImage->pTexture, SDL_BLENDMODE_BLEND);
+		SDL_SetTextureAlphaMod(pNode->pImage->pTexture, luaL_checknumber(L, 2));
+	}
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Error Occured During Setting Alpha", "You can't set alpha for a unopened image!", nullptr);
+
+	return 0;
+}
+
 ETHER_API node_SetDepth(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
@@ -284,6 +315,14 @@ ETHER_API node_RunAction(lua_State* L)
 
 	//交给动作管理列表
 	vAction.push_back(pNodeAction);
+
+	return 0;
+}
+
+ETHER_API node_SetPause(lua_State* L)
+{
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
+	pNode->isRuning = lua_toboolean(L, 2);
 
 	return 0;
 }
