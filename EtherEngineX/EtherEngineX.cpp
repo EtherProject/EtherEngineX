@@ -12,6 +12,8 @@ namespace EtherEngineX {
 
 extern std::unordered_map<const char*, EtherWindow*> mapAllWindows;
 
+extern std::vector<EtherNodeAction*> vAction;
+
 std::unordered_map<std::string, std::vector<std::string>> _nextScene;
 
 void _HandleQuit()
@@ -73,7 +75,8 @@ std::unordered_map<std::string, std::function<EtherModule*()>> _mapMoudles = {
 	{ "EtherWindow",[] {return &ModuleWindow::Instance(); }},
 	{ "EtherImage", [] {return &ModuleImage::Instance(); }},
 	{ "EtherNode", [] {return &ModuleNode::Instance(); } },
-	{ "EtherSprite", [] {return &ModuleSprite::Instance(); }}
+	{ "EtherSprite", [] {return &ModuleSprite::Instance(); }},
+	{ "EtherAction", [] {return &ModuleAction::Instance(); }}
 };
 
 ETHER_API UsingModule(lua_State* L)
@@ -170,6 +173,43 @@ int main(int argc, char** argv)
 				}
 			}
 
+			//检测动作管理向量中有没有需要删除的动作
+			for (int index = vAction.size() - 1; index >= 0; index--)
+			{
+				std::vector<EtherNodeAction*>::iterator iter = vAction.begin() + index;
+				if ((*iter)->isDone)
+					vAction.erase(iter);
+			}
+
+			//运行动作管理向量中的所有动作(这块的数据结构用的不漂亮)
+			for (std::vector<EtherNodeAction*>::iterator iter = vAction.begin(); iter != vAction.end(); iter++)
+			{
+				EtherNode* pNode = (*iter)->pNode;
+				if (pNode->isRuning)
+				{
+					std::vector<EtherAction*>::iterator iterA = (*iter)->vAction.begin() + (*iter)->index;
+					std::vector<std::function<void(EtherNode*, EtherAction*)> >::iterator iterNA = (*iter)->vNodeAction.begin() + (*iter)->index;
+					std::vector<EtherAction*>::iterator iterEnd = (*iter)->vAction.end();
+
+					if (iterA != iterEnd)
+					{
+						if ((*iterA)->progress < (*iterA)->last)
+						{
+							(*iterNA)(pNode, (*iterA));
+							(*iterA)->progress++;
+						}
+						else
+						{
+							(*iterA)->progress = 0;
+							(*iterA)->stop(EtherEngineX::pLState);
+							iterA++;
+						}
+					}
+					else
+						(*iter)->isDone = true;
+				}
+			}
+
 			//调用Update函数
 			lua_getfield(EtherEngineX::pLState, -1, "Update");
 			if (lua_pcall(EtherEngineX::pLState, 0, 1, 0))
@@ -181,8 +221,8 @@ int main(int argc, char** argv)
 			lua_pop(EtherEngineX::pLState, 1);
 
 			unsigned int timeFrameEnd = SDL_GetTicks();
-			if (timeFrameEnd - timeFrameStart < 1000 / 60)
-				SDL_Delay(1000 / 60 - (timeFrameEnd - timeFrameStart));
+			if (timeFrameEnd - timeFrameStart < 1000 / ETHER_FRAME)
+				SDL_Delay(1000 / ETHER_FRAME - (timeFrameEnd - timeFrameStart));
 		}
 
 		lua_getfield(EtherEngineX::pLState, -1, "Unload");

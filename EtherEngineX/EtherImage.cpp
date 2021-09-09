@@ -39,7 +39,9 @@ ModuleImage::ModuleImage()
 				{"SetPlaySpeed", image_SetPlaySpeed},
 				{"GetPlaySpeed", image_GetPlaySpeed},
 				{"SetCurrentFrame", image_SetCurrentFrame},
-				{"GetCurrentFrame", image_GetCurrentFrame}
+				{"GetCurrentFrame", image_GetCurrentFrame},
+				{"SetAngle", image_SetAngle},
+				{"GetAngle", image_GetAngle}
 			},
 			__gc_Image
 		}
@@ -246,6 +248,34 @@ ETHER_API image_GetCurrentFrame(lua_State* L)
 		lua_pushnumber(L, pImage->currentFrame);
 	else
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Get Frame Failed", "You can't get frame from a static image", nullptr);
+
+	return 1;
+}
+
+ETHER_API image_SetAngle(lua_State* L)
+{
+	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	double angle = lua_tonumber(L, 2);
+
+	if (!pImage->isRotated && angle != 0.0)
+	{
+		if (pImage->angle == 0.0)
+			pImage->isRotated = true;
+		pImage->angle = angle;
+	}
+	else if (pImage->angle != 0.0 && angle == 0.0)
+	{
+		pImage->isRotated = false;
+		pImage->angle = 0.0;
+	}
+
+	return 0;
+}
+
+ETHER_API image_GetAngle(lua_State* L)
+{
+	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	lua_pushnumber(L, pImage->angle);
 
 	return 1;
 }

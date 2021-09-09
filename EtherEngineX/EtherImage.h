@@ -37,7 +37,7 @@ public:
 
 	SDL_RendererFlip mode = SDL_FLIP_NONE;
 	SDL_Rect imageRect = { 0,0,0,0 };
-	SDL_Point anchorPoint = { 0,0 };
+	SDL_FPoint anchorPoint = { 0,0 };
 };
 
 class ModuleImage : public EtherModule
@@ -72,6 +72,10 @@ ETHER_API image_GetPlaySpeed(lua_State* L);
 ETHER_API image_SetCurrentFrame(lua_State* L);
 
 ETHER_API image_GetCurrentFrame(lua_State* L);
+
+ETHER_API image_SetAngle(lua_State* L);
+
+ETHER_API image_GetAngle(lua_State* L);
 
 ETHER_API __gc_Image(lua_State* L);
 

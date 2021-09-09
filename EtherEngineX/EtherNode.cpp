@@ -1,5 +1,25 @@
 #include "EtherNode.h"
 
+//管理动作的list
+std::vector<EtherNodeAction*> vAction;
+
+//各个动作对应的function
+std::unordered_map<ACTION_TYPE, std::function<void(EtherNode*, EtherAction*)> > mapFunction =
+{
+	{ACTION_TYPE::MOVEBY, [](EtherNode* pNode, EtherAction* pAction) ->void 
+		{
+			pNode->copyRect.x += pAction->mPoint.x / ETHER_FRAME;
+			pNode->copyRect.y += pAction->mPoint.y / ETHER_FRAME;
+		}
+	},
+	{ACTION_TYPE::MOVETO, [](EtherNode* pNode, EtherAction* pAction) ->void
+		{
+			pNode->copyRect.x += (pAction->mPoint.x - pNode->worldCopyRect.x) / ETHER_FRAME;
+			pNode->copyRect.y += (pAction->mPoint.y - pNode->worldCopyRect.y) / ETHER_FRAME;
+		}
+	}
+};
+
 ModuleNode& ModuleNode::Instance()
 {
 	static ModuleNode* _instance = new ModuleNode();
@@ -28,7 +48,8 @@ ModuleNode::ModuleNode()
 				{"SetDepth", node_SetDepth},
 				{"GetDepth", node_GetDepth},
 				{"AddChild", node_AddChild},
-				{"DeleteChild", node_DeleteChild}
+				{"DeleteChild", node_DeleteChild},
+				{"RunAction", node_RunAction}
 			},
 			__gc_Node
 		}
@@ -53,41 +74,44 @@ void EtherNode::Draw()
 
 	if (pImage->isRotated)
 	{
+		SDL_FPoint worldAnchorPoint;
+		worldAnchorPoint.x = worldCopyRect.x + pImage->anchorPoint.x;
+		worldAnchorPoint.y = worldCopyRect.y + pImage->anchorPoint.y;
 		if (pImage->isDynamic)
 		{
 			pImage->imageFrameEnd = SDL_GetTicks();
-			if ((pImage->imageFrameEnd - pImage->imageFrameStart) * 0.06 >= pImage->playSpeed)
+			if ((pImage->imageFrameEnd - pImage->imageFrameStart) * (ETHER_FRAME / 1000) >= pImage->playSpeed)
 			{
 				pImage->imageFrameStart = pImage->imageFrameEnd;
 				pImage->imageRect.x = (pImage->currentFrame % pImage->xAmount) * pImage->imageRect.w;
 				pImage->imageRect.y = (pImage->currentFrame / pImage->xAmount) * pImage->imageRect.h;
-				SDL_RenderCopyEx(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &pImage->anchorPoint, pImage->mode);
+				SDL_RenderCopyExF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &worldAnchorPoint, pImage->mode);
 				pImage->currentFrame = (pImage->currentFrame + 1) % pImage->frameAmount;
 			}
 			else
-				SDL_RenderCopyEx(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &pImage->anchorPoint, pImage->mode);
+				SDL_RenderCopyExF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &worldAnchorPoint, pImage->mode);
 		}
 		else
-			SDL_RenderCopyEx(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &pImage->anchorPoint, pImage->mode);
+			SDL_RenderCopyExF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &worldAnchorPoint, pImage->mode);
 	}
 	else
 	{
 		if (pImage->isDynamic)
 		{
 			pImage->imageFrameEnd = SDL_GetTicks();
-			if ((pImage->imageFrameEnd - pImage->imageFrameStart) * 0.06 >= pImage->playSpeed)
+			if ((pImage->imageFrameEnd - pImage->imageFrameStart) * (ETHER_FRAME / 1000) >= pImage->playSpeed)
 			{
 				pImage->imageFrameStart = pImage->imageFrameEnd;
 				pImage->imageRect.x = (pImage->currentFrame % pImage->xAmount) * pImage->imageRect.w;
 				pImage->imageRect.y = (pImage->currentFrame / pImage->xAmount) * pImage->imageRect.h;
-				SDL_RenderCopy(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect);
+				SDL_RenderCopyF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect);
 				pImage->currentFrame = (pImage->currentFrame + 1) % pImage->frameAmount;
 			}
 			else
-				SDL_RenderCopy(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect);
+				SDL_RenderCopyF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect);
 		}
 		else
-			SDL_RenderCopy(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect);
+			SDL_RenderCopyF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect);
 	}
 	
 	if (!children.empty())
@@ -146,7 +170,7 @@ ETHER_API node_SetCopyRect(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 
-	SDL_Rect rect = GetRectParam(L, 2);
+	SDL_FRect rect = GetFRectParam(L, 2);
 	pNode->copyRect.x = rect.x;
 	pNode->copyRect.y = rect.y;
 	pNode->copyRect.w = rect.w;
@@ -235,6 +259,32 @@ ETHER_API node_DeleteChild(lua_State* L)
 	vector<EtherNode*>::iterator iterNode = pNode->children.begin() + index;
 	pNode->children.erase(iterNode);
 	
+	return 0;
+}
+
+ETHER_API node_RunAction(lua_State* L)
+{
+	using namespace std;
+
+	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
+	int size = lua_gettop(L);
+
+	EtherNodeAction* pNodeAction = new EtherNodeAction();
+	pNodeAction->pNode = pNode;
+
+	EtherAction* pAction;
+
+	//将需要加入的动作塞进去
+	for (int i = 2; i <= size; i++)
+	{
+		pAction = (EtherAction*)(*(void**)lua_touserdata(L, i));
+		pNodeAction->vAction.emplace_back(pAction);
+		pNodeAction->vNodeAction.emplace_back(mapFunction[pAction->type]);
+	}
+
+	//交给动作管理列表
+	vAction.push_back(pNodeAction);
+
 	return 0;
 }
 

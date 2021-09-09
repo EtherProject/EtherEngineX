@@ -3,6 +3,7 @@ EtherNode = UsingModule("EtherNode")
 EtherWindow = UsingModule("EtherWindow")
 EtherImage = UsingModule("EtherImage")
 EtherSprite = UsingModule("EtherSprite")
+EtherAction = UsingModule("EtherAction")
 
 local window = EtherWindow.CreateWindow("test1", {x = 100, y = 100, w = 960, h = 640}, {})
 local layer = window:CreateLayer()
@@ -17,7 +18,8 @@ function Main.Init()
     sprite:AddImage(image2)
     image1:SetImageDynamic(true, 4, 100, 100)
     image1:SetCurrentFrame(2)
-    sprite:SetCopyRect({x = 0, y = 0, w = 200, h = 200})
+    image1:SetAngle(30)
+    sprite:SetCopyRect({x = 100, y = 100, w = 200, h = 200})
     sprite:ChangeImage(1)
 end
 
