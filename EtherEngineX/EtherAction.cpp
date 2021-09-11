@@ -12,7 +12,15 @@ ModuleAction::ModuleAction()
 	{
 		{"CreateMoveTo", CreateMoveTo},
 		{"CreateMoveBy", CreateMoveBy},
-		{"CreateSpinBy", CreateSpinBy}
+		{"CreateSpinTo", CreateSpinTo},
+		{"CreateSpinBy", CreateSpinBy},
+		{"CreateFadeTo", CreateFadeTo}
+	};
+
+	_vMacros =
+	{
+		{"ROTATION_CLOCKWISE", (int)ROTATION::CLOCKWISE},
+		{"ROTATION_ANTI_CLOCKWISE", (int)ROTATION::ANTI_CLOCKWISE}
 	};
 
 	_vMetaData =
@@ -42,6 +50,14 @@ MoveBy::MoveBy(SDL_FPoint point, unsigned int time)
 	type = ACTION_TYPE::MOVEBY;
 }
 
+SpinTo::SpinTo(double angle, unsigned int time, Uint8 direction)
+{
+	mAngle = angle;
+	mDirection = direction;
+	last = time * ETHER_FRAME;
+	type = ACTION_TYPE::SPINTO;
+}
+
 SpinBy::SpinBy(double angle, unsigned int time)
 {
 	mAngle = angle;
@@ -49,7 +65,7 @@ SpinBy::SpinBy(double angle, unsigned int time)
 	type = ACTION_TYPE::SPINBY;
 }
 
-FadeTo::FadeTo(short alhpa, unsigned int time)
+FadeTo::FadeTo(Uint8 alhpa, unsigned int time)
 {
 	mAlpha = alhpa;
 	last = time * ETHER_FRAME;
@@ -58,7 +74,6 @@ FadeTo::FadeTo(short alhpa, unsigned int time)
 
 ETHER_API CreateMoveTo(lua_State* L)
 {
-
 	MoveTo* pAction = new MoveTo(GetFPointParam(L, 1), lua_tonumber(L, 2));
 	EtherAction** uppAction = (EtherAction**)lua_newuserdata(L, sizeof(EtherAction*));
 	*uppAction = pAction;
@@ -71,6 +86,17 @@ ETHER_API CreateMoveTo(lua_State* L)
 ETHER_API CreateMoveBy(lua_State* L)
 {
 	MoveBy* pAction = new MoveBy(GetFPointParam(L, 1), lua_tonumber(L, 2));
+	EtherAction** uppAction = (EtherAction**)lua_newuserdata(L, sizeof(EtherAction*));
+	*uppAction = pAction;
+	luaL_getmetatable(L, "EtherAction");
+	lua_setmetatable(L, -2);
+
+	return 1;
+}
+
+ETHER_API CreateSpinTo(lua_State* L)
+{
+	SpinTo* pAction = new SpinTo(lua_tonumber(L, 1), lua_tonumber(L, 2), lua_tonumber(L, 3));
 	EtherAction** uppAction = (EtherAction**)lua_newuserdata(L, sizeof(EtherAction*));
 	*uppAction = pAction;
 	luaL_getmetatable(L, "EtherAction");

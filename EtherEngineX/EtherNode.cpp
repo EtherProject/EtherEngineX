@@ -1,5 +1,7 @@
 #include "EtherNode.h"
 
+#include <cmath>
+
 //管理动作的list
 std::vector<EtherNodeAction*> vAction;
 
@@ -15,22 +17,28 @@ std::unordered_map<ACTION_TYPE, std::function<void(EtherNode*, EtherAction*)> > 
 
 	{ACTION_TYPE::MOVETO, [](EtherNode* pNode, EtherAction* pAction) ->void
 		{
-			pNode->copyRect.x += (pAction->mPoint.x - pNode->copyRect.x) / pAction->last;
-			pNode->copyRect.y += (pAction->mPoint.y - pNode->copyRect.y) / pAction->last;
+			pNode->copyRect.x += (pAction->mPoint.x - pNode->copyRect.x) / (pAction->last - pAction->progress);
+			pNode->copyRect.y += (pAction->mPoint.y - pNode->copyRect.y) / (pAction->last - pAction->progress);
+		}
+	},
+
+	{ACTION_TYPE::SPINTO, [](EtherNode* pNode, EtherAction* pAction) ->void
+		{
+			
 		}
 	},
 
 	{ACTION_TYPE::SPINBY, [](EtherNode* pNode, EtherAction* pAction) ->void
 		{
-			pNode->pImage->isRotated = true;
-			pNode->pImage->angle += pAction->mAngle / pAction->last;
+			pNode->pImage->angle = fmod(pNode->pImage->angle + pAction->mAngle / pAction->last, 360.0);
 		}
 	},
 
 	{ACTION_TYPE::FADETO, [](EtherNode* pNode, EtherAction* pAction) ->void
 		{
-			SDL_SetTextureBlendMode(pNode->pImage->pTexture, SDL_BLENDMODE_BLEND);
-			SDL_SetTextureAlphaMod(pNode->pImage->pTexture, pAction->mAlpha / pAction->last);
+			//由于alpha值为int，而当前的动作管理有可能将其变为小数
+			//所以暂时不方便实现FADETO功能
+			//敬请之后推出
 		}
 	}
 };
@@ -58,7 +66,6 @@ ModuleNode::ModuleNode()
 				{"GetImage", node_GetImage},
 				{"SetCopyRect", node_SetCopyRect},
 				{"GetCopyRect", node_GetCopyRect},
-				{"SetAlpha", node_SetAlpha},
 				{"SetParent", node_SetParent},
 				{"GetParent", node_GetParent},
 				{"SetDepth", node_SetDepth},
@@ -89,47 +96,22 @@ void EtherNode::Draw()
 		worldCopyRect.y = copyRect.y;
 	}
 
-	if (pImage->isRotated)
+	if (pImage->isDynamic)
 	{
-		SDL_FPoint worldAnchorPoint;
-		worldAnchorPoint.x = worldCopyRect.x + pImage->anchorPoint.x;
-		worldAnchorPoint.y = worldCopyRect.y + pImage->anchorPoint.y;
-		if (pImage->isDynamic)
+		pImage->imageFrameEnd = SDL_GetTicks();
+		if ((pImage->imageFrameEnd - pImage->imageFrameStart) * (ETHER_FRAME / 1000) >= pImage->playSpeed)
 		{
-			pImage->imageFrameEnd = SDL_GetTicks();
-			if ((pImage->imageFrameEnd - pImage->imageFrameStart) * (ETHER_FRAME / 1000) >= pImage->playSpeed)
-			{
-				pImage->imageFrameStart = pImage->imageFrameEnd;
-				pImage->imageRect.x = (pImage->currentFrame % pImage->xAmount) * pImage->imageRect.w;
-				pImage->imageRect.y = (pImage->currentFrame / pImage->xAmount) * pImage->imageRect.h;
-				SDL_RenderCopyExF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &worldAnchorPoint, pImage->mode);
-				pImage->currentFrame = (pImage->currentFrame + 1) % pImage->frameAmount;
-			}
-			else
-				SDL_RenderCopyExF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &worldAnchorPoint, pImage->mode);
+			pImage->imageFrameStart = pImage->imageFrameEnd;
+			pImage->imageRect.x = (pImage->currentFrame % pImage->xAmount) * pImage->imageRect.w;
+			pImage->imageRect.y = (pImage->currentFrame / pImage->xAmount) * pImage->imageRect.h;
+			SDL_RenderCopyExF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &pImage->anchorPoint, pImage->mode);
+			pImage->currentFrame = (pImage->currentFrame + 1) % pImage->frameAmount;
 		}
 		else
-			SDL_RenderCopyExF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &worldAnchorPoint, pImage->mode);
+			SDL_RenderCopyExF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &pImage->anchorPoint, pImage->mode);
 	}
 	else
-	{
-		if (pImage->isDynamic)
-		{
-			pImage->imageFrameEnd = SDL_GetTicks();
-			if ((pImage->imageFrameEnd - pImage->imageFrameStart) * (ETHER_FRAME / 1000) >= pImage->playSpeed)
-			{
-				pImage->imageFrameStart = pImage->imageFrameEnd;
-				pImage->imageRect.x = (pImage->currentFrame % pImage->xAmount) * pImage->imageRect.w;
-				pImage->imageRect.y = (pImage->currentFrame / pImage->xAmount) * pImage->imageRect.h;
-				SDL_RenderCopyF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect);
-				pImage->currentFrame = (pImage->currentFrame + 1) % pImage->frameAmount;
-			}
-			else
-				SDL_RenderCopyF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect);
-		}
-		else
-			SDL_RenderCopyF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect);
-	}
+		SDL_RenderCopyExF(pRenderer, pImage->pTexture, &pImage->imageRect, &worldCopyRect, pImage->angle, &pImage->anchorPoint, pImage->mode);
 	
 	if (!children.empty())
 		for (vector<EtherNode*>::iterator iter = children.begin(); iter != children.end(); iter++)
@@ -157,6 +139,7 @@ ETHER_API node_SetImage(lua_State* L)
 		if (!pImage->isOpened)
 		{
 			pImage->pTexture = SDL_CreateTextureFromSurface(pNode->pRenderer, pImage->pSurface);
+			SDL_SetTextureBlendMode(pImage->pTexture, SDL_BLENDMODE_BLEND);
 			pImage->isOpened = true;
 		}
 		pNode->pImage = pImage;
@@ -238,20 +221,6 @@ ETHER_API node_GetParent(lua_State* L)
 	lua_setmetatable(L, -2);
 
 	return 1;
-}
-
-ETHER_API node_SetAlpha(lua_State* L)
-{
-	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
-	if (pNode->pImage->isOpened)
-	{
-		SDL_SetTextureBlendMode(pNode->pImage->pTexture, SDL_BLENDMODE_BLEND);
-		SDL_SetTextureAlphaMod(pNode->pImage->pTexture, luaL_checknumber(L, 2));
-	}
-	else
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Error Occured During Setting Alpha", "You can't set alpha for a unopened image!", nullptr);
-
-	return 0;
 }
 
 ETHER_API node_SetDepth(lua_State* L)

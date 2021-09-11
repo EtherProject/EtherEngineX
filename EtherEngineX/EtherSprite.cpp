@@ -57,6 +57,7 @@ ETHER_API sprite_AddImage(lua_State* L)
 	if (!pImage->isOpened)
 	{
 		pImage->pTexture = SDL_CreateTextureFromSurface(pSprite->pRenderer, pImage->pSurface);
+		SDL_SetTextureBlendMode(pImage->pTexture, SDL_BLENDMODE_BLEND);
 		pImage->isOpened = true;
 	}
 

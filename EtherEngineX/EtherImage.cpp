@@ -36,6 +36,8 @@ ModuleImage::ModuleImage()
 				{"GetAnchorPoint", image_GetAnchorPoint},
 				{"SetImageRect", image_SetImageRect},
 				{"GetImageRect", image_GetImageRect},
+				{"SetAlpha", image_SetAlpha},
+				{"GetAlpha", image_GetAlpha},
 				{"SetPlaySpeed", image_SetPlaySpeed},
 				{"GetPlaySpeed", image_GetPlaySpeed},
 				{"SetCurrentFrame", image_SetCurrentFrame},
@@ -209,6 +211,29 @@ ETHER_API image_GetImageRect(lua_State* L)
 	return 1;
 }
 
+ETHER_API image_SetAlpha(lua_State* L)
+{
+	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+
+	if (pImage->isOpened)
+		SDL_SetTextureAlphaMod(pImage->pTexture, luaL_checknumber(L, 2));
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Error Occured During Setting Alpha", "You can't set alpha for a unopened image!", nullptr);
+
+	return 0;
+}
+
+ETHER_API image_GetAlpha(lua_State* L)
+{
+	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+
+	Uint8 alpha;
+	SDL_GetTextureAlphaMod(pImage->pTexture, &alpha);
+	lua_pushnumber(L, alpha);
+
+	return 1;
+}
+
 ETHER_API image_SetPlaySpeed(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
@@ -256,18 +281,6 @@ ETHER_API image_SetAngle(lua_State* L)
 {
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
 	double angle = lua_tonumber(L, 2);
-
-	if (!pImage->isRotated && angle != 0.0)
-	{
-		if (pImage->angle == 0.0)
-			pImage->isRotated = true;
-		pImage->angle = angle;
-	}
-	else if (pImage->angle != 0.0 && angle == 0.0)
-	{
-		pImage->isRotated = false;
-		pImage->angle = 0.0;
-	}
 
 	return 0;
 }

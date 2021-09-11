@@ -17,6 +17,12 @@ enum class ACTION_TYPE
 	FADETO
 };
 
+enum class ROTATION
+{
+	CLOCKWISE = 0,
+	ANTI_CLOCKWISE
+};
+
 class EtherAction
 {
 public:
@@ -32,7 +38,8 @@ public:
 	//由于暂时没有其他好主意,于是乎把所有动作的对应变量放在这了
 	SDL_FPoint mPoint;
 	double mAngle;
-	short mAlpha;
+	Uint8 mDirection;
+	Uint8 mAlpha;
 
 protected:
 	EtherAction() {}
@@ -50,7 +57,12 @@ public:
 	MoveBy(SDL_FPoint point, unsigned int time);
 };
 
-//存在BUG，待修复
+class SpinTo : public EtherAction
+{
+public:
+	SpinTo(double angle, unsigned int time, Uint8 direction);
+};
+
 class SpinBy :public EtherAction
 {
 public:
@@ -60,7 +72,7 @@ public:
 class FadeTo : public EtherAction
 {
 public:
-	FadeTo(short alpha, unsigned int time);
+	FadeTo(Uint8 alpha, unsigned int time);
 };
 
 class ModuleAction : public EtherModule
@@ -75,6 +87,8 @@ private:
 ETHER_API CreateMoveTo(lua_State* L);
 
 ETHER_API CreateMoveBy(lua_State* L);
+
+ETHER_API CreateSpinTo(lua_State* L);
 
 ETHER_API CreateSpinBy(lua_State* L);
 

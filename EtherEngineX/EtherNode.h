@@ -70,8 +70,6 @@ ETHER_API node_SetCopyRect(lua_State* L);
 
 ETHER_API node_GetCopyRect(lua_State* L);
 
-ETHER_API node_SetAlpha(lua_State* L);
-
 ETHER_API node_SetParent(lua_State* L);
 
 ETHER_API node_GetParent(lua_State* L);

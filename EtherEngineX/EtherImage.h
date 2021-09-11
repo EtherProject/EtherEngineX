@@ -14,7 +14,6 @@ public:
 
 	~EtherImage();
 
-	bool isRotated = false;
 	bool isDynamic = false;
 	bool isOpened = false;
 	double angle = 0;
@@ -64,6 +63,10 @@ ETHER_API image_GetAnchorPoint(lua_State* L);
 ETHER_API image_SetImageRect(lua_State* L);
 
 ETHER_API image_GetImageRect(lua_State* L);
+
+ETHER_API image_SetAlpha(lua_State* L);
+
+ETHER_API image_GetAlpha(lua_State* L);
 
 ETHER_API image_SetPlaySpeed(lua_State* L);
 
