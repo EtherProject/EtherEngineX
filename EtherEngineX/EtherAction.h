@@ -14,6 +14,7 @@ enum class ACTION_TYPE
 	MOVEBY,
 	SPINTO,
 	SPINBY,
+	SCALETO,
 	FADETO
 };
 
@@ -33,12 +34,21 @@ public:
 	//结束后会调用的函数
 	lua_CFunction stop = [](lua_State* L) -> int { return 0; };
 	//动作的类型
-	ACTION_TYPE type = ACTION_TYPE::MOVEBY;
+	ACTION_TYPE type;
 
 	//由于暂时没有其他好主意,于是乎把所有动作的对应变量放在这了
+
+	//用于MoveTo和MoveBy的点
 	SDL_FPoint mPoint;
+	
+	//用于旋转的角度和方向
 	double mAngle;
 	Uint8 mDirection;
+
+	//用于放大缩小的变化矩形
+	float mWidth, mHeight;
+
+	//用于alpha通道变化的值
 	Uint8 mAlpha;
 
 protected:
@@ -60,13 +70,19 @@ public:
 class SpinTo : public EtherAction
 {
 public:
-	SpinTo(double angle, unsigned int time, Uint8 direction);
+	SpinTo(double angle, unsigned int time, Uint8 direction = 0);
 };
 
 class SpinBy :public EtherAction
 {
 public:
 	SpinBy(double angle, unsigned int time);
+};
+
+class ScaleTo :public EtherAction
+{
+public:
+	ScaleTo(float w, float h, unsigned int time);
 };
 
 class FadeTo : public EtherAction
@@ -91,6 +107,8 @@ ETHER_API CreateMoveBy(lua_State* L);
 ETHER_API CreateSpinTo(lua_State* L);
 
 ETHER_API CreateSpinBy(lua_State* L);
+
+ETHER_API CreateScaleTo(lua_State* L);
 
 ETHER_API CreateFadeTo(lua_State* L);
 

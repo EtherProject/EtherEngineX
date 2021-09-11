@@ -14,6 +14,7 @@ ModuleAction::ModuleAction()
 		{"CreateMoveBy", CreateMoveBy},
 		{"CreateSpinTo", CreateSpinTo},
 		{"CreateSpinBy", CreateSpinBy},
+		{"CreateScaleTo", CreateScaleTo},
 		{"CreateFadeTo", CreateFadeTo}
 	};
 
@@ -65,6 +66,14 @@ SpinBy::SpinBy(double angle, unsigned int time)
 	type = ACTION_TYPE::SPINBY;
 }
 
+ScaleTo::ScaleTo(float w, float h, unsigned int time)
+{
+	mWidth = w;
+	mHeight = h;
+	last = time * ETHER_FRAME;
+	type = ACTION_TYPE::SCALETO;
+}
+
 FadeTo::FadeTo(Uint8 alhpa, unsigned int time)
 {
 	mAlpha = alhpa;
@@ -108,6 +117,17 @@ ETHER_API CreateSpinTo(lua_State* L)
 ETHER_API CreateSpinBy(lua_State* L)
 {
 	SpinBy* pAction = new SpinBy(lua_tonumber(L, 1), lua_tonumber(L, 2));
+	EtherAction** uppAction = (EtherAction**)lua_newuserdata(L, sizeof(EtherAction*));
+	*uppAction = pAction;
+	luaL_getmetatable(L, "EtherAction");
+	lua_setmetatable(L, -2);
+
+	return 1;
+}
+
+ETHER_API CreateScaleTo(lua_State* L)
+{
+	ScaleTo* pAction = new ScaleTo(lua_tonumber(L, 1), lua_tonumber(L, 2), lua_tonumber(L, 3));
 	EtherAction** uppAction = (EtherAction**)lua_newuserdata(L, sizeof(EtherAction*));
 	*uppAction = pAction;
 	luaL_getmetatable(L, "EtherAction");

@@ -62,6 +62,7 @@ ETHER_API sprite_AddImage(lua_State* L)
 	}
 
 	pSprite->vImage.push_back(pImage);
+	pSprite->pImage = pImage;
 
 	return 0;
 }

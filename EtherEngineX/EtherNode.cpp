@@ -24,13 +24,36 @@ std::unordered_map<ACTION_TYPE, std::function<void(EtherNode*, EtherAction*)> > 
 
 	{ACTION_TYPE::SPINTO, [](EtherNode* pNode, EtherAction* pAction) ->void
 		{
-			
+			if (pAction->mDirection == (Uint8)ROTATION::CLOCKWISE)
+			{
+				double dAngle = fmod(pAction->mAngle, 360.0);
+				double sAngle = fmod(pNode->pImage->angle, 360.0);
+				if (dAngle < sAngle)
+					pNode->pImage->angle += (dAngle + 360.0 - sAngle) / (pAction->last - pAction->progress);
+				else if (dAngle > sAngle)
+					pNode->pImage->angle += (dAngle - sAngle) / (pAction->last - pAction->progress);
+			}
+			else
+			{
+				double dAngle = fmod(pAction->mAngle, 360.0);
+				double sAngle = fmod(pNode->pImage->angle, 360.0);
+				if (sAngle < dAngle)
+					pNode->pImage->angle -= (sAngle + 360.0 - dAngle) / (pAction->last - pAction->progress);
+				else if (sAngle > sAngle)
+					pNode->pImage->angle -= (sAngle - dAngle) / (pAction->last - pAction->progress);
+			}
 		}
 	},
 
 	{ACTION_TYPE::SPINBY, [](EtherNode* pNode, EtherAction* pAction) ->void
 		{
 			pNode->pImage->angle = fmod(pNode->pImage->angle + pAction->mAngle / pAction->last, 360.0);
+		}
+	},
+	{ACTION_TYPE::SCALETO, [](EtherNode* pNode, EtherAction* pAction) ->void
+		{
+			pNode->copyRect.w += (pAction->mWidth - pNode->copyRect.w) / (pAction->last - pAction->progress);
+			pNode->copyRect.h += (pAction->mHeight - pNode->copyRect.h) / (pAction->last - pAction->progress);
 		}
 	},
 
@@ -95,6 +118,8 @@ void EtherNode::Draw()
 		worldCopyRect.x = copyRect.x;
 		worldCopyRect.y = copyRect.y;
 	}
+	worldCopyRect.w = copyRect.w;
+	worldCopyRect.h = copyRect.h;
 
 	if (pImage->isDynamic)
 	{
@@ -175,8 +200,6 @@ ETHER_API node_SetCopyRect(lua_State* L)
 	pNode->copyRect.y = rect.y;
 	pNode->copyRect.w = rect.w;
 	pNode->copyRect.h = rect.h;
-	pNode->worldCopyRect.w = rect.w;
-	pNode->worldCopyRect.h = rect.h;
 
 	return 0;
 }
@@ -206,7 +229,9 @@ ETHER_API node_SetParent(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	EtherNode* parent = (EtherNode*)(*(void**)lua_touserdata(L, 2));
+
 	pNode->parent = parent;
+	pNode->pRenderer = parent->pRenderer;
 	parent->children.push_back(pNode);
 
 	return 0;
@@ -244,6 +269,8 @@ ETHER_API node_AddChild(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	EtherNode* pChild = (EtherNode*)(*(void**)lua_touserdata(L, 2));
+
+	pChild->pRenderer = pNode->pRenderer;
 	pNode->children.push_back(pChild);
 	pChild->parent = pNode;
 
