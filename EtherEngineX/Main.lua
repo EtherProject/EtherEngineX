@@ -30,7 +30,6 @@ function Main.Init()
     sprite1:RunAction(action2, action3)
     sprite1:RunAction(action1)
     sprite1:RunAction(action5)
-    sprite2:RunAction(action1)
 end
 
 function Main.Update()

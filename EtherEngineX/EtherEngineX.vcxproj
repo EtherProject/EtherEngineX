@@ -147,6 +147,7 @@
     <ClCompile Include="AdenJSON.cpp" />
     <ClCompile Include="EtherAction.cpp" />
     <ClCompile Include="EtherEngineX.cpp" />
+    <ClCompile Include="EtherEvent.cpp" />
     <ClCompile Include="EtherImage.cpp" />
     <ClCompile Include="EtherModule.cpp" />
     <ClCompile Include="EtherNode.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="AdenJSON.h" />
     <ClInclude Include="EtherAction.h" />
     <ClInclude Include="EtherEngineX.h" />
+    <ClInclude Include="EtherEvent.h" />
     <ClInclude Include="EtherImage.h" />
     <ClInclude Include="EtherMacros.h" />
     <ClInclude Include="EtherModule.h" />
