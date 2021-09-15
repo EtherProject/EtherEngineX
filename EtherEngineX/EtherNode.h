@@ -39,6 +39,8 @@ public:
 class EtherNodeAction
 {
 public:
+	//NodeAction中的Action全为副本,在析构时应一一删除
+	~EtherNodeAction();
 	//动作是否完成,完成后在下一次会被删除
 	bool isDone = false;
 	//当前运行到的动作

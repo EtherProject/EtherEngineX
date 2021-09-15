@@ -30,7 +30,8 @@ ModuleAction::ModuleAction()
 			"EtherAction",
 			nullptr,
 			{
-				{"ModifyTime", action_ModifyTime}
+				{"ModifyTime", action_ModifyTime},
+				{"SetCallback", action_SetCallback}
 			},
 			__gc_Action
 		}
@@ -156,9 +157,18 @@ ETHER_API action_ModifyTime(lua_State* L)
 	return 0;
 }
 
+ETHER_API action_SetCallback(lua_State* L)
+{
+	EtherAction* pAction = (EtherAction*)(*(void**)lua_touserdata(L, 1));
+	pAction->callBack = luaL_ref(L, LUA_REGISTRYINDEX);
+
+	return 0;
+}
+
 ETHER_API __gc_Action(lua_State* L)
 {
 	EtherAction* pAction = (EtherAction*)(*(void**)lua_touserdata(L, 1));
+	luaL_unref(L, LUA_REGISTRYINDEX, pAction->callBack);
 	delete pAction;
 
 	return 0;

@@ -32,7 +32,7 @@ public:
 	//持续时间(单位：帧)
 	unsigned int last = 0;
 	//结束后会调用的函数
-	lua_CFunction stop = [](lua_State* L) -> int { return 0; };
+	lua_Integer callBack = LUA_REFNIL;
 	//动作的类型
 	ACTION_TYPE type;
 
@@ -113,6 +113,8 @@ ETHER_API CreateScaleTo(lua_State* L);
 ETHER_API CreateFadeTo(lua_State* L);
 
 ETHER_API action_ModifyTime(lua_State* L);
+
+ETHER_API action_SetCallback(lua_State* L);
 
 ETHER_API __gc_Action(lua_State* L);
 

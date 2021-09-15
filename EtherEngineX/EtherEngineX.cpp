@@ -4,16 +4,20 @@ namespace EtherEngineX {
 	lua_State* pLState = luaL_newstate();
 	std::string strSceneName;
 
-	SDL_Event event;
-
 	const int QuitGame = -2;
 	const int Continue = -1;
 }
 
+//窗口管理
 extern std::unordered_map<const char*, EtherWindow*> mapAllWindows;
 
+//动作管理
 extern std::vector<EtherNodeAction*> vAction;
 
+//事件管理
+EtherListenerManager listenerManager = EtherListenerManager::Instance();
+
+//场景管理
 std::unordered_map<std::string, std::vector<std::string>> _nextScene;
 
 void _HandleQuit()
@@ -76,7 +80,8 @@ std::unordered_map<std::string, std::function<EtherModule*()>> _mapMoudles = {
 	{ "EtherImage", [] {return &ModuleImage::Instance(); }},
 	{ "EtherNode", [] {return &ModuleNode::Instance(); } },
 	{ "EtherSprite", [] {return &ModuleSprite::Instance(); }},
-	{ "EtherAction", [] {return &ModuleAction::Instance(); }}
+	{ "EtherAction", [] {return &ModuleAction::Instance(); }},
+	{ "EtherListener", [] {return &ModuleEvent::Instance(); }}
 };
 
 ETHER_API UsingModule(lua_State* L)
@@ -154,10 +159,32 @@ int main(int argc, char** argv)
 		{
 			unsigned int timeFrameStart = SDL_GetTicks();
 
-			//事件获取
-			while (SDL_PollEvent(&EtherEngineX::event))
+			//监听者管理(处理事件)
+			while (SDL_PollEvent(&listenerManager.event))
 			{
-
+				switch (listenerManager.event.type)
+				{
+				case SDL_MOUSEMOTION:
+				case SDL_MOUSEBUTTONDOWN:
+				case SDL_MOUSEBUTTONUP:
+				case SDL_MOUSEWHEEL:
+					listenerManager.currentType = LISTENER_TYPE::MOUSE;
+					break;
+				case SDL_KEYDOWN:
+				case SDL_KEYUP:
+					listenerManager.currentType = LISTENER_TYPE::KEYBOARD;
+					break;
+				}
+				for (auto iter = listenerManager.mapListener.begin(); iter != listenerManager.mapListener.end(); iter++)
+				{
+					if ((*iter).second->type == listenerManager.currentType)
+					{
+						if (listenerManager.currentType == LISTENER_TYPE::MOUSE)
+							(*iter).second->mouse.callBack(EtherEngineX::pLState, &listenerManager.event);
+						else if (listenerManager.currentType == LISTENER_TYPE::KEYBOARD)
+							(*iter).second->keyboard.callBack(EtherEngineX::pLState, &listenerManager.event);
+					}
+				}
 			}
 
 			//将画面绘制出来
@@ -178,7 +205,10 @@ int main(int argc, char** argv)
 			{
 				std::vector<EtherNodeAction*>::iterator iter = vAction.begin() + index;
 				if ((*iter)->isDone)
+				{
+					delete vAction[index];
 					vAction.erase(iter);
+				}
 			}
 
 			//运行动作管理向量中的所有动作(这块的数据结构用的不漂亮)
@@ -201,7 +231,11 @@ int main(int argc, char** argv)
 						else
 						{
 							(*iterA)->progress = 0;
-							(*iterA)->stop(EtherEngineX::pLState);
+							if ((*iterA)->callBack != LUA_REFNIL)
+							{
+								lua_rawgeti(EtherEngineX::pLState, LUA_REGISTRYINDEX, (*iterA)->callBack);
+								lua_pcall(EtherEngineX::pLState, 0, 0, 0);
+							}
 							(*iter)->index++;
 						}
 					}

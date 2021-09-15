@@ -5,6 +5,12 @@
 //管理动作的list
 std::vector<EtherNodeAction*> vAction;
 
+EtherNodeAction::~EtherNodeAction()
+{
+	for (int i = vAction.size() - 1; i >= 0; i--)
+		delete vAction[i];
+}
+
 //各个动作对应的function
 std::unordered_map<ACTION_TYPE, std::function<void(EtherNode*, EtherAction*)> > mapFunction =
 {
@@ -305,8 +311,10 @@ ETHER_API node_RunAction(lua_State* L)
 	for (int i = 2; i <= size; i++)
 	{
 		pAction = (EtherAction*)(*(void**)lua_touserdata(L, i));
-		pNodeAction->vAction.emplace_back(pAction);
-		pNodeAction->vNodeAction.emplace_back(mapFunction[pAction->type]);
+		EtherAction* pActionCopy = new EtherAction(*pAction);
+
+		pNodeAction->vAction.emplace_back(pActionCopy);
+		pNodeAction->vNodeAction.emplace_back(mapFunction[pActionCopy->type]);
 	}
 
 	//交给动作管理列表

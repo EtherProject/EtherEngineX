@@ -19,6 +19,7 @@ local action5 = EtherAction.CreateScaleTo(400, 400, 4)
 
 function Main.Init()
     print("Here are Main.Init()")
+
     layer:AddNode(sprite1)
     sprite1:AddImage(image1)
     sprite1:AddChild(sprite2)
@@ -30,6 +31,7 @@ function Main.Init()
     sprite1:RunAction(action2, action3)
     sprite1:RunAction(action1)
     sprite1:RunAction(action5)
+    sprite2:RunAction(action1)
 end
 
 function Main.Update()

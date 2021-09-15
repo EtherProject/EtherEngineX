@@ -1,8 +1,6 @@
 #ifndef _ETHER_ENGINE_X_H_
 #define _ETHER_ENGINE_X_H_
 
-#include "EtherMacros.h"
-#include "EtherModule.h"
 #include "AdenJSON.h"
 
 #include "EtherNode.h"
@@ -10,6 +8,7 @@
 #include "EtherImage.h"
 #include "EtherSprite.h"
 #include "EtherAction.h"
+#include "EtherEvent.h"
 
 #include <lua.hpp>
 #include <cJSON.h>

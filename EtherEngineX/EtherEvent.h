@@ -5,37 +5,58 @@
 #include "EtherMacros.h"
 #include "EtherUtils.h"
 
-#include <queue>
 #include <unordered_map>
 
-class EtherEvent
+enum class LISTENER_TYPE
+{
+	NONE = 0,
+	MOUSE,
+	KEYBOARD
+};
+
+class MouseListener
 {
 public:
+	MouseListener();
+	~MouseListener() {}
 
+	void callBack(lua_State*, SDL_Event*);
+
+	lua_Integer callDown = LUA_REFNIL;
+	lua_Integer callUp = LUA_REFNIL;
+	lua_Integer callMotion = LUA_REFNIL;
+	lua_Integer callWheel = LUA_REFNIL;
+
+	SDL_Point cursorPoint;
+	SDL_Point wheelLength;
+};
+
+class KeyboardListener
+{
+public:
+	KeyboardListener();
+	~KeyboardListener() {}
+
+	void callBack(lua_State*, SDL_Event*);
+
+	lua_Integer callDown = LUA_REFNIL;
+	lua_Integer callUp = LUA_REFNIL;
 };
 
 class EtherListener
 {
 public:
-	EtherListener();
-	~EtherListener();
+	EtherListener(const char*, LISTENER_TYPE);
+	~EtherListener() {}
 
-	Uint32 type;
-};
+	LISTENER_TYPE type;
+	const char* name;
 
-class MouseListener : public EtherListener
-{
-public:
-	MouseListener();
-	~MouseListener();
-
-};
-
-class KeyboardListener : public EtherListener
-{
-public:
-	KeyboardListener();
-	~KeyboardListener();
+	union
+	{
+		MouseListener mouse;
+		KeyboardListener keyboard;
+	};
 };
 
 class EtherListenerManager
@@ -44,12 +65,14 @@ public:
 	static EtherListenerManager& Instance();
 
 	~EtherListenerManager() {}
-protected:
+
+	SDL_Event event;
+
+	LISTENER_TYPE currentType = LISTENER_TYPE::NONE;
+
+	std::unordered_map<const char*, EtherListener*> mapListener;
+private:
 	EtherListenerManager() {}
-
-	std::unordered_map<const char*, EtherListener*> listenerMannger;
-
-	std::queue<EtherEvent*> eventQueue;
 };
 
 class ModuleEvent : public EtherModule
@@ -60,5 +83,23 @@ public:
 private:
 	ModuleEvent();
 };
+
+ETHER_API CreateMouseListener(lua_State* L);
+
+ETHER_API CreateKeyboardListener(lua_State* L);
+
+ETHER_API event_SetButtonDown(lua_State* L);
+
+ETHER_API event_SetButtonUp(lua_State* L);
+
+ETHER_API event_SetMotion(lua_State* L);
+
+ETHER_API event_SetWheel(lua_State* L);
+
+ETHER_API event_GetCursorPoint(lua_State* L);
+
+ETHER_API event_GetWheelLength(lua_State* L);
+
+ETHER_API __gc_Listener(lua_State* L);
 
 #endif // !_EVENT_H_
