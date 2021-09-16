@@ -46,11 +46,8 @@ public:
 	LISTENER_TYPE type = LISTENER_TYPE::NONE;
 	const char* name;
 
-	union
-	{
-		MouseListener mouse;
-		KeyboardListener keyboard;
-	};
+	MouseListener mouse;
+	KeyboardListener keyboard;
 };
 
 class EtherListenerManager

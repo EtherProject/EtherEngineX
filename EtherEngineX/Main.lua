@@ -19,6 +19,10 @@ local action5 = EtherAction.CreateScaleTo(400, 400, 4)
 
 local listener = EtherEvent.CreateMouseListener("sakuya")
 
+listener:SetButtonDown(function()
+    print("test listener")
+end)
+
 action1:SetCallback(function()
     print("test")
 end)

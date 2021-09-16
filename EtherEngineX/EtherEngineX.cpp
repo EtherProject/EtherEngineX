@@ -173,7 +173,6 @@ int main(int argc, char** argv)
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
 					listenerManager.currentType = LISTENER_TYPE::KEYBOARD;
-					break;
 				}
 				for (auto iter = listenerManager.mapListener.begin(); iter != listenerManager.mapListener.end(); iter++)
 				{
@@ -191,12 +190,11 @@ int main(int argc, char** argv)
 			std::unordered_map<const char*, EtherWindow*>::iterator iterEnd = mapAllWindows.end();
 			for (std::unordered_map<const char*, EtherWindow*>::iterator iter = mapAllWindows.begin(); iter != iterEnd; iter++)
 			{
-				std::vector<EtherLayer*> vCampLayer = (*iter).second->vLayer;
-				for (std::vector<EtherLayer*>::iterator _iter = vCampLayer.begin(); _iter != vCampLayer.end(); _iter++)
+				for (std::vector<EtherLayer*>::iterator _iter = (*iter).second->vLayer.begin(); _iter != (*iter).second->vLayer.end(); _iter++)
 				{
-					SDL_RenderClear((*iter).second->pRenderer);
+					SDL_RenderClear((*_iter)->pRenderer);
 					(*_iter)->Draw();
-					SDL_RenderPresent((*iter).second->pRenderer);
+					SDL_RenderPresent((*_iter)->pRenderer);
 				}
 			}
 

@@ -1,5 +1,7 @@
 #include "EtherEvent.h"
 
+#include <iostream>
+
 EtherListenerManager listenerManager;
 
 ModuleEvent& ModuleEvent::Instance()
@@ -47,28 +49,28 @@ void MouseListener::callBack(lua_State* L, SDL_Event* event)
 {
 	switch (event->type)
 	{
-	case (int)SDL_MOUSEBUTTONDOWN:
+	case SDL_MOUSEBUTTONDOWN:
 		if (callDown != LUA_REFNIL)
 		{
 			lua_rawgeti(L, LUA_REGISTRYINDEX, callDown);
 			lua_pcall(L, 0, 0, 0);
 			break;
 		}
-	case (int)SDL_MOUSEBUTTONUP:
+	case SDL_MOUSEBUTTONUP:
 		if (callUp != LUA_REFNIL)
 		{
 			lua_rawgeti(L, LUA_REGISTRYINDEX, callUp);
 			lua_pcall(L, 0, 0, 0);
 			break;
 		}
-	case (int)SDL_MOUSEMOTION:
+	case SDL_MOUSEMOTION:
 		if (callMotion != LUA_REFNIL)
 		{
 			lua_rawgeti(L, LUA_REGISTRYINDEX, callMotion);
 			lua_pcall(L, 0, 0, 0);
 			break;
 		}
-	case (int)SDL_MOUSEWHEEL:
+	case SDL_MOUSEWHEEL:
 		if (callWheel != LUA_REFNIL)
 		{
 			lua_rawgeti(L, LUA_REGISTRYINDEX, callWheel);
@@ -82,14 +84,14 @@ void KeyboardListener::callBack(lua_State* L, SDL_Event* event)
 {
 	switch (event->type)
 	{
-	case (int)SDL_KEYDOWN:
+	case SDL_KEYDOWN:
 		if (callDown != LUA_REFNIL)
 		{
 			lua_rawgeti(L, LUA_REGISTRYINDEX, callDown);
 			lua_pcall(L, 0, 0, 0);
 			break;
 		}
-	case (int)SDL_KEYUP:
+	case SDL_KEYUP:
 		if (callUp != LUA_REFNIL)
 		{
 			lua_rawgeti(L, LUA_REGISTRYINDEX, callUp);
@@ -130,11 +132,7 @@ ETHER_API CreateKeyboardListener(lua_State* L)
 ETHER_API listener_SetButtonDown(lua_State* L)
 {
 	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
-
-	if (pListener->type == LISTENER_TYPE::MOUSE)
-		pListener->mouse.callDown = luaL_ref(L, LUA_REGISTRYINDEX);
-	else
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Callback Failed", "Type mismatch", nullptr);
+	pListener->mouse.callDown = luaL_ref(L, LUA_REGISTRYINDEX);
 
 	return 0;
 }
