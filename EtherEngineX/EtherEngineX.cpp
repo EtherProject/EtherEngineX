@@ -15,7 +15,7 @@ extern std::unordered_map<const char*, EtherWindow*> mapAllWindows;
 extern std::vector<EtherNodeAction*> vAction;
 
 //事件管理
-EtherListenerManager listenerManager = EtherListenerManager::Instance();
+extern EtherListenerManager listenerManager;
 
 //场景管理
 std::unordered_map<std::string, std::vector<std::string>> _nextScene;
@@ -81,7 +81,7 @@ std::unordered_map<std::string, std::function<EtherModule*()>> _mapMoudles = {
 	{ "EtherNode", [] {return &ModuleNode::Instance(); } },
 	{ "EtherSprite", [] {return &ModuleSprite::Instance(); }},
 	{ "EtherAction", [] {return &ModuleAction::Instance(); }},
-	{ "EtherListener", [] {return &ModuleEvent::Instance(); }}
+	{ "EtherEvent", [] {return &ModuleEvent::Instance(); }}
 };
 
 ETHER_API UsingModule(lua_State* L)
@@ -270,7 +270,6 @@ int main(int argc, char** argv)
 	}
 	lua_pop(EtherEngineX::pLState, 1);
 
-	std::cin.get();
 	//安全退出
 	_HandleQuit();
 	

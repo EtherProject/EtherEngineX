@@ -4,6 +4,7 @@ EtherWindow = UsingModule("EtherWindow")
 EtherImage = UsingModule("EtherImage")
 EtherSprite = UsingModule("EtherSprite")
 EtherAction = UsingModule("EtherAction")
+EtherEvent = UsingModule("EtherEvent")
 
 local window = EtherWindow.CreateWindow("test1", {x = 100, y = 100, w = 960, h = 640}, {})
 local layer = window:CreateLayer()
@@ -14,8 +15,13 @@ local image2 = EtherImage.LoadImageFromFile("testImage.png")
 local action1 = EtherAction.CreateSpinBy(-3600.0, 4)
 local action2 = EtherAction.CreateMoveBy({x = 500, y = 500}, 2)
 local action3 = EtherAction.CreateMoveTo({x = 50, y = 50}, 2)
-local action4 = EtherAction.CreateSpinTo(30, 2, EtherAction.ROTATION_ANTI_CLOCKWISE)
 local action5 = EtherAction.CreateScaleTo(400, 400, 4)
+
+local listener = EtherEvent.CreateMouseListener("sakuya")
+
+action1:SetCallback(function()
+    print("test")
+end)
 
 function Main.Init()
     print("Here are Main.Init()")
