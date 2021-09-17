@@ -123,7 +123,7 @@ int main(int argc, char** argv)
 	//lua启动所有标准库
 	luaL_openlibs(EtherEngineX::pLState);
 	//设置垃圾回收数值
-	lua_gc(EtherEngineX::pLState, LUA_GCINC, 100);
+	lua_gc(EtherEngineX::pLState, LUA_GCINC, 200);
 
 	//读取配置文件
 	bool ok = _LoadConfig();
@@ -168,33 +168,23 @@ int main(int argc, char** argv)
 				case SDL_MOUSEBUTTONDOWN:
 				case SDL_MOUSEBUTTONUP:
 				case SDL_MOUSEWHEEL:
-					listenerManager.currentType = LISTENER_TYPE::MOUSE;
+					listenerManager.currentType = EVENT_TYPE::MOUSE;
 					break;
 				case SDL_KEYDOWN:
 				case SDL_KEYUP:
-					listenerManager.currentType = LISTENER_TYPE::KEYBOARD;
+					listenerManager.currentType = EVENT_TYPE::KEYBOARD;
+					break;
 				}
+
 				for (auto iter = listenerManager.mapListener.begin(); iter != listenerManager.mapListener.end(); iter++)
 				{
-					if ((*iter).second->type == listenerManager.currentType)
+					if (listenerManager.currentType == (*iter).second->type)
 					{
-						if (listenerManager.currentType == LISTENER_TYPE::MOUSE)
-							(*iter).second->mouse.callBack(EtherEngineX::pLState, &listenerManager.event);
-						else if (listenerManager.currentType == LISTENER_TYPE::KEYBOARD)
-							(*iter).second->keyboard.callBack(EtherEngineX::pLState, &listenerManager.event);
+						if (listenerManager.currentType == EVENT_TYPE::MOUSE)
+							(*iter).second->mouse.Callback(EtherEngineX::pLState, &listenerManager.event);
+						else if (listenerManager.currentType == EVENT_TYPE::KEYBOARD)
+							(*iter).second->keyboard.Callback(EtherEngineX::pLState, &listenerManager.event);
 					}
-				}
-			}
-
-			//将画面绘制出来
-			std::unordered_map<const char*, EtherWindow*>::iterator iterEnd = mapAllWindows.end();
-			for (std::unordered_map<const char*, EtherWindow*>::iterator iter = mapAllWindows.begin(); iter != iterEnd; iter++)
-			{
-				for (std::vector<EtherLayer*>::iterator _iter = (*iter).second->vLayer.begin(); _iter != (*iter).second->vLayer.end(); _iter++)
-				{
-					SDL_RenderClear((*_iter)->pRenderer);
-					(*_iter)->Draw();
-					SDL_RenderPresent((*_iter)->pRenderer);
 				}
 			}
 
@@ -209,7 +199,7 @@ int main(int argc, char** argv)
 				}
 			}
 
-			//运行动作管理向量中的所有动作(这块的数据结构用的不漂亮)
+			//运行动作管理向量中的所有动作
 			for (std::vector<EtherNodeAction*>::iterator iter = vAction.begin(); iter != vAction.end(); iter++)
 			{
 				EtherNode* pNode = (*iter)->pNode;
@@ -252,6 +242,16 @@ int main(int argc, char** argv)
 			sceneIndex = lua_tointeger(EtherEngineX::pLState, -1) - 1;
 			lua_pop(EtherEngineX::pLState, 1);
 
+			//将画面绘制出来
+			for (auto iter = mapAllWindows.begin(); iter != mapAllWindows.end(); iter++)
+				for (auto _iter = (*iter).second->vNode.begin(); _iter != (*iter).second->vNode.end(); _iter++)
+				{
+					SDL_RenderClear((*iter).second->pRenderer);
+					(*_iter)->Draw();
+					SDL_RenderPresent((*iter).second->pRenderer);
+				}
+
+			//延时,保证游戏帧数
 			unsigned int timeFrameEnd = SDL_GetTicks();
 			if (timeFrameEnd - timeFrameStart < 1000 / ETHER_FRAME)
 				SDL_Delay(1000 / ETHER_FRAME - (timeFrameEnd - timeFrameStart));

@@ -9,20 +9,6 @@
 #include <unordered_map>
 #include <vector>
 
-class EtherLayer
-{
-public:
-	EtherLayer() {}
-
-	~EtherLayer() {}
-
-	void Draw();
-
-	SDL_Renderer* pRenderer = nullptr;
-
-	std::vector<EtherNode*> children;
-};
-
 class EtherWindow
 {
 public:
@@ -36,7 +22,7 @@ public:
 
 	const char* name;
 
-	std::vector<EtherLayer*> vLayer;
+	std::vector<EtherNode*> vNode;
 };
 
 
@@ -98,16 +84,10 @@ ETHER_API window_GetWindowPosition(lua_State* L);
 
 ETHER_API window_SetWindowPosition(lua_State* L);
 
-ETHER_API window_CreateLayer(lua_State* L);
+ETHER_API window_AddNode(lua_State* L);
 
-ETHER_API window_DeleteLayer(lua_State* L);
+ETHER_API window_DeleteNode(lua_State* L);
 
 ETHER_API __gc_Window(lua_State* L);
-
-ETHER_API layer_AddNode(lua_State* L);
-
-ETHER_API layer_DeleteNode(lua_State* L);
-
-ETHER_API __gc_Layer(lua_State* L);
 
 #endif // !_WINDOW_H_

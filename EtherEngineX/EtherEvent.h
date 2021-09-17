@@ -7,22 +7,21 @@
 
 #include <unordered_map>
 
-enum class LISTENER_TYPE
+enum class EVENT_TYPE
 {
 	NONE = 0,
 	MOUSE,
-	KEYBOARD
+	KEYBOARD,
 };
 
 class MouseListener
 {
 public:
-	void callBack(lua_State*, SDL_Event*);
+	void Callback(lua_State*, SDL_Event*);
 
 	lua_Integer callDown = LUA_REFNIL;
 	lua_Integer callUp = LUA_REFNIL;
 	lua_Integer callMotion = LUA_REFNIL;
-	lua_Integer callWheel = LUA_REFNIL;
 
 	SDL_Point cursorPoint = { 0,0 };
 	SDL_Point wheelLength = { 0,0 };
@@ -31,7 +30,7 @@ public:
 class KeyboardListener
 {
 public:
-	void callBack(lua_State*, SDL_Event*);
+	void Callback(lua_State*, SDL_Event*);
 
 	lua_Integer callDown = LUA_REFNIL;
 	lua_Integer callUp = LUA_REFNIL;
@@ -40,11 +39,9 @@ public:
 class EtherListener
 {
 public:
-	EtherListener(const char*, LISTENER_TYPE);
-	~EtherListener() {}
+	EtherListener(EVENT_TYPE);
 
-	LISTENER_TYPE type = LISTENER_TYPE::NONE;
-	const char* name;
+	EVENT_TYPE type;
 
 	MouseListener mouse;
 	KeyboardListener keyboard;
@@ -58,8 +55,7 @@ public:
 	~EtherListenerManager() {}
 
 	SDL_Event event;
-
-	LISTENER_TYPE currentType = LISTENER_TYPE::NONE;
+	EVENT_TYPE currentType = EVENT_TYPE::NONE;
 
 	std::unordered_map<const char*, EtherListener*> mapListener;
 };
@@ -83,13 +79,19 @@ ETHER_API listener_SetButtonUp(lua_State* L);
 
 ETHER_API listener_SetMotion(lua_State* L);
 
-ETHER_API listener_SetWheel(lua_State* L);
-
-ETHER_API listener_GetButtonState(lua_State* L);
+ETHER_API listener_GetButtonType(lua_State* L);
 
 ETHER_API listener_GetCursorPoint(lua_State* L);
 
 ETHER_API listener_GetWheelLength(lua_State* L);
+
+ETHER_API listener_SetKeyDown(lua_State* L);
+
+ETHER_API listener_SetKeyUp(lua_State* L);
+
+ETHER_API listener_GetKeyType(lua_State* L);
+
+ETHER_API listener_GetKeyMod(lua_State* L);
 
 ETHER_API __gc_Listener(lua_State* L);
 
