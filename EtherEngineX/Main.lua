@@ -5,12 +5,14 @@ EtherImage = UsingModule("EtherImage")
 EtherSprite = UsingModule("EtherSprite")
 EtherAction = UsingModule("EtherAction")
 EtherEvent = UsingModule("EtherEvent")
+EtherMedia = UsingModule("EtherMedia")
 
 local window = EtherWindow.CreateWindow("test1", {x = 100, y = 100, w = 960, h = 640}, {})
 local sprite1 = EtherSprite.CreateSprite()
 local sprite2 = EtherSprite.CreateSprite()
 local image1 = EtherImage.LoadImageFromFile("test.png")
 local image2 = EtherImage.LoadImageFromFile("testImage.png")
+
 local action1 = EtherAction.CreateSpinBy(-3600.0, 4)
 local action2 = EtherAction.CreateMoveBy({x = 500, y = 500}, 2)
 local action3 = EtherAction.CreateMoveTo({x = 50, y = 50}, 2)
@@ -18,16 +20,24 @@ local action5 = EtherAction.CreateScaleTo(400, 400, 4)
 
 local listener = EtherEvent.CreateWindowListener("sakuya")
 
-listener:SetWindowEnter(function()
-    print("Oh, you back!")
-end)
+local music = EtherMedia.LoadMusic("test.mp3")
+
+local returnValue = 0
 
 action1:SetCallback(function()
-    print("test")
+    returnValue = 1
 end)
 
 function Main.Init()
     print("Here are Main.Init()")
+
+    listener:SetWindowEnter(function()
+        print("Oh! You're back~ A.A")
+    end)
+
+    listener:SetWindowLeave(function()
+        print("Don't leave me QAQ")
+    end)
 
     window:AddNode(sprite1)
     sprite1:AddImage(image1)
@@ -41,10 +51,12 @@ function Main.Init()
     sprite1:RunAction(action1)
     sprite1:RunAction(action5)
     sprite2:RunAction(action1)
+
+    music:PlayWithFadeIn(-1, 2000)
 end
 
 function Main.Update()
-    return 0
+    return returnValue
 end
 
 function Main.Unload()

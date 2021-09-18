@@ -9,6 +9,7 @@
 #include "EtherSprite.h"
 #include "EtherAction.h"
 #include "EtherEvent.h"
+#include "EtherMedia.h"
 
 #include <lua.hpp>
 #include <cJSON.h>

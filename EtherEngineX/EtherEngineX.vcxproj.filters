@@ -54,6 +54,9 @@
     <ClCompile Include="EtherEvent.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="EtherMedia.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EtherEngineX.h">
@@ -90,6 +93,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="EtherEvent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EtherMedia.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

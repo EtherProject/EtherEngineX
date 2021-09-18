@@ -75,13 +75,14 @@ bool _LoadConfig()
 	return true;
 }
 
-std::unordered_map<std::string, std::function<EtherModule*()>> _mapMoudles = {
+std::unordered_map<std::string, std::function<EtherModule* ()>> _mapMoudles = {
 	{ "EtherWindow",[] {return &ModuleWindow::Instance(); }},
 	{ "EtherImage", [] {return &ModuleImage::Instance(); }},
 	{ "EtherNode", [] {return &ModuleNode::Instance(); } },
 	{ "EtherSprite", [] {return &ModuleSprite::Instance(); }},
 	{ "EtherAction", [] {return &ModuleAction::Instance(); }},
-	{ "EtherEvent", [] {return &ModuleEvent::Instance(); }}
+	{ "EtherEvent", [] {return &ModuleEvent::Instance(); }},
+	{ "EtherMedia", [] {return &ModuleMedia::Instance(); }}
 };
 
 ETHER_API UsingModule(lua_State* L)
@@ -123,7 +124,7 @@ int main(int argc, char** argv)
 	//lua启动所有标准库
 	luaL_openlibs(EtherEngineX::pLState);
 	//设置垃圾回收数值
-	lua_gc(EtherEngineX::pLState, LUA_GCINC, 200);
+	lua_gc(EtherEngineX::pLState, LUA_GCINC, 100);
 
 	//读取配置文件
 	bool ok = _LoadConfig();

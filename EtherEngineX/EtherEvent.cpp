@@ -609,7 +609,6 @@ ETHER_API __gc_Listener(lua_State* L)
 		else if (pListener->keyboard.callUp != LUA_REFNIL)
 			luaL_unref(L, LUA_REGISTRYINDEX, pListener->keyboard.callUp);
 	}
-
 	delete pListener;
 
 	return 0;

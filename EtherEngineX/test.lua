@@ -5,8 +5,7 @@ function test.Init()
 end
 
 function test.Update()
-    print("Here are test.Update()")
-    return -1
+    return 0
 end
 
 function test.Unload()

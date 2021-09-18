@@ -1,5 +1,7 @@
 #include "EtherNode.h"
 
+#include <iostream>
+
 #include <cmath>
 
 //管理动作的list
