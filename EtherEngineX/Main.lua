@@ -16,18 +16,10 @@ local action2 = EtherAction.CreateMoveBy({x = 500, y = 500}, 2)
 local action3 = EtherAction.CreateMoveTo({x = 50, y = 50}, 2)
 local action5 = EtherAction.CreateScaleTo(400, 400, 4)
 
-local listener = EtherEvent.CreateKeyboardListener("sakuya")
+local listener = EtherEvent.CreateWindowListener("sakuya")
 
-listener:SetKeyDown(function()
-    if listener:GetKeyType() == EtherEvent.KEY_H then
-        print("H down")
-    end
-end)
-
-listener:SetKeyUp(function()
-    if listener:GetKeyType() == EtherEvent.KEY_H then
-        print("H up")
-    end
+listener:SetWindowEnter(function()
+    print("Oh, you back!")
 end)
 
 action1:SetCallback(function()

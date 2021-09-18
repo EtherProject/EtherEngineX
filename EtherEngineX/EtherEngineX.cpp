@@ -174,6 +174,8 @@ int main(int argc, char** argv)
 				case SDL_KEYUP:
 					listenerManager.currentType = EVENT_TYPE::KEYBOARD;
 					break;
+				case SDL_WINDOWEVENT:
+					listenerManager.currentType = EVENT_TYPE::WINDOW;
 				}
 
 				for (auto iter = listenerManager.mapListener.begin(); iter != listenerManager.mapListener.end(); iter++)
@@ -184,6 +186,8 @@ int main(int argc, char** argv)
 							(*iter).second->mouse.Callback(EtherEngineX::pLState, &listenerManager.event);
 						else if (listenerManager.currentType == EVENT_TYPE::KEYBOARD)
 							(*iter).second->keyboard.Callback(EtherEngineX::pLState, &listenerManager.event);
+						else if (listenerManager.currentType == EVENT_TYPE::WINDOW)
+							(*iter).second->window.Callback(EtherEngineX::pLState, &listenerManager.event);
 					}
 				}
 			}

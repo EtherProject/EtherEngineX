@@ -48,6 +48,7 @@ ModuleWindow::ModuleWindow()
 				{"SetWindowMinSize", window_SetWindowMinSize},
 				{"GetWindowPosition", window_GetWindowPosition},
 				{"SetWindowPosition", window_SetWindowPosition},
+				{"GetWindowID", window_GetWindowID},
 				{"AddNode", window_AddNode},
 				{"DeleteNode", window_DeleteNode}
 			},
@@ -273,6 +274,14 @@ ETHER_API window_SetWindowPosition(lua_State* L)
 	SDL_SetWindowPosition(pEWindow->pWindow, point.x, point.y);
 
 	return 0;
+}
+
+ETHER_API window_GetWindowID(lua_State* L)
+{
+	EtherWindow* pEWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
+	lua_pushnumber(L, SDL_GetWindowID(pEWindow->pWindow));
+
+	return 1;
 }
 
 ETHER_API window_AddNode(lua_State* L)

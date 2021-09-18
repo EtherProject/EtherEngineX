@@ -84,6 +84,8 @@ ETHER_API window_GetWindowPosition(lua_State* L);
 
 ETHER_API window_SetWindowPosition(lua_State* L);
 
+ETHER_API window_GetWindowID(lua_State* L);
+
 ETHER_API window_AddNode(lua_State* L);
 
 ETHER_API window_DeleteNode(lua_State* L);

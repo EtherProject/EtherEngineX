@@ -10,8 +10,9 @@ ModuleEvent& ModuleEvent::Instance()
 	return *_instance;
 }
 
-EtherListener::EtherListener(EVENT_TYPE paramType)
+EtherListener::EtherListener(const char* paramName, EVENT_TYPE paramType)
 {
+	name = paramName;
 	type = paramType;
 }
 
@@ -20,7 +21,9 @@ ModuleEvent::ModuleEvent()
 	_vCMethods =
 	{
 		{"CreateMouseListener", CreateMouseListener},
-		{"CreateKeyboardListener", CreateKeyboardListener}
+		{"CreateKeyboardListener", CreateKeyboardListener},
+		{"CreateWindowListener", CreateWindowListener},
+		{"RemoveListener", RemoveListener}
 	};
 
 	_vMacros =
@@ -31,6 +34,49 @@ ModuleEvent::ModuleEvent()
 		{"MOUSE_MIDDLEBUTTON", SDL_BUTTON_MIDDLE},
 
 		//键盘宏
+		//符号按键
+		{"KEY_UNKNOWN", SDLK_UNKNOWN},
+		{"KEY_RETURN", SDLK_RETURN},
+		{"KEY_EACAPE", SDLK_ESCAPE},
+		{"KEY_BACKSPACE", SDLK_BACKSPACE},
+		{"KEY_TAB", SDLK_TAB},
+		{"KEY_SPACE", SDLK_SPACE},
+		{"KEY_EXCLAIM", SDLK_EXCLAIM},
+		{"KEY_QUOTEDBL", SDLK_QUOTEDBL},
+		{"KEY_HASH", SDLK_HASH},
+		{"KEY_PERCENT", SDLK_PERCENT},
+		{"KEY_DOLLAR", SDLK_DOLLAR},
+		{"KEY_AMPERSAND", SDLK_AMPERSAND},
+		{"KEY_QUOTE", SDLK_QUOTE},
+		{"KEY_LEFTPAREN", SDLK_LEFTPAREN},
+		{"KEY_RIGHTPAREN", SDLK_RIGHTPAREN},
+		{"KEY_ASTERISK", SDLK_ASTERISK},
+		{"KEY_PLUS", SDLK_PLUS},
+		{"KEY_COMMA", SDLK_COMMA},
+		{"KEY_MINUS", SDLK_MINUS},
+		{"KEY_PERIOD", SDLK_PERIOD},
+		{"KEY_SLASH", SDLK_SLASH},
+		{"KEY_COLON", SDLK_COLON},
+		{"KEY_SEMICOLON", SDLK_SEMICOLON},
+		{"KEY_LESS", SDLK_LESS},
+		{"KEY_EQUALS", SDLK_EQUALS},
+		{"KEY_GREATER", SDLK_GREATER},
+		{"KEY_QUESTION", SDLK_QUESTION},
+		{"KEY_AT", SDLK_AT},
+		{"KEY_LEFTBRACKET", SDLK_LEFTBRACKET},
+		{"KEY_BACKSLASH", SDLK_BACKSLASH},
+		{"KEY_CARET", SDLK_CARET},
+		{"KEY_UNDERSCORE", SDLK_UNDERSCORE},
+		{"KEY_BACKQUOTE", SDLK_BACKQUOTE},
+		{"KEY_LCTRL", SDLK_LCTRL},
+		{"KEY_RCTRL", SDLK_RCTRL},
+		{"KEY_LSHIFT", SDLK_LSHIFT},
+		{"KEY_RSHIFT", SDLK_RSHIFT},
+		{"KEY_LALT", SDLK_LALT},
+		{"KEY_RALT", SDLK_RALT},
+		{"KEY_LGUI", SDLK_LGUI},
+		{"KEY_RGUI", SDLK_RGUI},
+		//字母及数字按键
 		{"KEY_Q", SDLK_q},
 		{"KEY_W", SDLK_w},
 		{"KEY_E", SDLK_e},
@@ -67,6 +113,7 @@ ModuleEvent::ModuleEvent()
 		{"KEY_7", SDLK_7},
 		{"KEY_8", SDLK_8},
 		{"KEY_9", SDLK_9},
+		//mod按键
 		{"KEY_F1", SDLK_F1},
 		{"KEY_F2", SDLK_F2},
 		{"KEY_F3", SDLK_F3},
@@ -78,7 +125,51 @@ ModuleEvent::ModuleEvent()
 		{"KEY_F9", SDLK_F9},
 		{"KEY_F10", SDLK_F10},
 		{"KEY_F11", SDLK_F11},
-		{"KEY_F12", SDLK_F12}
+		{"KEY_F12", SDLK_F12},
+		{"KEY_F13", SDLK_F13},
+		{"KEY_F14", SDLK_F14},
+		{"KEY_F15", SDLK_F15},
+		{"KEY_F16", SDLK_F16},
+		{"KEY_F17", SDLK_F17},
+		{"KEY_F18", SDLK_F18},
+		{"KEY_F19", SDLK_F19},
+		{"KEY_F20", SDLK_F20},
+		{"KEY_F21", SDLK_F21},
+		{"KEY_F22", SDLK_F22},
+		{"KEY_F23", SDLK_F23},
+		{"KEY_F24", SDLK_F24},
+		{"KEY_CAPSLOCK", SDLK_CAPSLOCK},
+		{"KEY_PRINTSCREEN", SDLK_PRINTSCREEN},
+		{"KEY_SCROLLLOCK", SDLK_SCROLLLOCK},
+		{"KEY_PAUSE", SDLK_PAUSE},
+		{"KEY_INSERT", SDLK_INSERT},
+		{"KEY_HOME", SDLK_HOME},
+		{"KEY_PAGEUP", SDLK_PAGEUP},
+		{"KEY_DELETE", SDLK_DELETE},
+		{"KEY_END", SDLK_END},
+		{"KEY_PAGEDOWN", SDLK_PAGEDOWN},
+		{"KEY_RIGHT", SDLK_RIGHT},
+		{"KEY_LEFT", SDLK_LEFT},
+		{"KEY_DOWN", SDLK_DOWN},
+		{"KEY_UP", SDLK_UP},
+		//小键盘
+		{"KEY_NUMLOCKCLEAR", SDLK_NUMLOCKCLEAR},
+		{"KEY_KP_DIVIDE", SDLK_KP_DIVIDE},
+		{"KEY_KP_MULTIPLY", SDLK_KP_MULTIPLY},
+		{"KEY_KP_MINUS", SDLK_KP_MINUS},
+		{"KEY_KP_PLUS", SDLK_KP_PLUS},
+		{"KEY_KP_ENTER", SDLK_KP_ENTER},
+		{"KEY_KP_0", SDLK_KP_0},
+		{"KEY_KP_1", SDLK_KP_1},
+		{"KEY_KP_2", SDLK_KP_2},
+		{"KEY_KP_3", SDLK_KP_3},
+		{"KEY_KP_4", SDLK_KP_4},
+		{"KEY_KP_5", SDLK_KP_5},
+		{"KEY_KP_6", SDLK_KP_6},
+		{"KEY_KP_7", SDLK_KP_7},
+		{"KEY_KP_8", SDLK_KP_8},
+		{"KEY_KP_9", SDLK_KP_9},
+		{"KEY_KP_PERIOD", SDLK_KP_PERIOD},
 	};
 
 	_vMetaData =
@@ -87,6 +178,8 @@ ModuleEvent::ModuleEvent()
 			"EtherListener",
 			nullptr,
 			{
+				{"GetName", listener_GetName},
+
 			//鼠标监听事件
 				{"SetButtonDown", listener_SetButtonDown},
 				{"SetButtonUp", listener_SetButtonUp},
@@ -101,7 +194,20 @@ ModuleEvent::ModuleEvent()
 				{"SetKeyUp", listener_SetKeyUp},
 
 				{"GetKeyType", listener_GetKeyType},
-				{"GetKeyMod", listener_GetKeyMod}
+				{"GetKeyMod", listener_GetKeyMod},
+
+			//窗口事件
+				{"SetWindowShown", listener_SetWindowShown},
+				{"SetWindowHidden", listener_SetWindowHidden},
+				{"SetWindowEnter", listener_SetWindowEnter},
+				{"SetWindowLeave", listener_SetWindowLeave},
+				{"SetWindowFocusGained", listener_SetWindowFocusGained},
+				{"SetWindowFocusLost", listener_SetWindowFocusLost},
+				{"SetWindowClose", listener_SetWindowClose},
+				{"SetWindowResize", listener_SetWindowResize},
+				{"SetWindowMove", listener_SetWindowMove},
+
+				{"GetWindowEventID", listener_GetEventWindowID}
 			},
 			__gc_Listener
 		},
@@ -141,11 +247,60 @@ void KeyboardListener::Callback(lua_State* L, SDL_Event* event)
 	}
 }
 
+void WindowListener::Callback(lua_State* L, SDL_Event* event)
+{
+	if (event->window.event == SDL_WINDOWEVENT_SHOWN && callShown != LUA_REFNIL)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, callShown);
+		lua_pcall(L, 0, 0, 0);
+	}
+	else if (event->window.event == SDL_WINDOWEVENT_HIDDEN && callHidden != LUA_REFNIL)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, callHidden);
+		lua_pcall(L, 0, 0, 0);
+	}
+	else if (event->window.event == SDL_WINDOWEVENT_ENTER && callEnter != LUA_REFNIL)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, callEnter);
+		lua_pcall(L, 0, 0, 0);
+	}
+	else if (event->window.event == SDL_WINDOWEVENT_LEAVE && callLeave != LUA_REFNIL)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, callLeave);
+		lua_pcall(L, 0, 0, 0);
+	}
+	else if (event->window.event == SDL_WINDOWEVENT_FOCUS_GAINED && callFocusGained != LUA_REFNIL)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, callFocusGained);
+		lua_pcall(L, 0, 0, 0);
+	}
+	else if (event->window.event == SDL_WINDOWEVENT_FOCUS_LOST && callFocusLost != LUA_REFNIL)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, callFocusLost);
+		lua_pcall(L, 0, 0, 0);
+	}
+	else if (event->window.event == SDL_WINDOWEVENT_CLOSE && callClose != LUA_REFNIL)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, callClose);
+		lua_pcall(L, 0, 0, 0);
+	}
+	else if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED && callResize != LUA_REFNIL)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, callResize);
+		lua_pcall(L, 0, 0, 0);
+	}
+	else if (event->window.event == SDL_WINDOWEVENT_MOVED && callMove != LUA_REFNIL)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, callMove);
+		lua_pcall(L, 0, 0, 0);
+	}
+}
+
 ETHER_API CreateMouseListener(lua_State* L)
 {
 	const char* name = lua_tostring(L, 1);
 
-	EtherListener* pListener = new EtherListener(EVENT_TYPE::MOUSE);
+	EtherListener* pListener = new EtherListener(name, EVENT_TYPE::MOUSE);
 	listenerManager.mapListener[name] = pListener;
 
 	EtherListener** uppListener = (EtherListener**)lua_newuserdata(L, sizeof(EtherListener*));
@@ -160,13 +315,46 @@ ETHER_API CreateKeyboardListener(lua_State* L)
 {
 	const char* name = lua_tostring(L, 1);
 
-	EtherListener* pListener = new EtherListener(EVENT_TYPE::KEYBOARD);
+	EtherListener* pListener = new EtherListener(name, EVENT_TYPE::KEYBOARD);
 	listenerManager.mapListener[name] = pListener;
 
 	EtherListener** uppListener = (EtherListener**)lua_newuserdata(L, sizeof(EtherListener*));
 	*uppListener = pListener;
 	luaL_getmetatable(L, "EtherListener");
 	lua_setmetatable(L, -2);
+
+	return 1;
+}
+
+ETHER_API CreateWindowListener(lua_State* L)
+{
+	const char* name = lua_tostring(L, 1);
+
+	EtherListener* pListener = new EtherListener(name, EVENT_TYPE::WINDOW);
+	listenerManager.mapListener[name] = pListener;
+
+	EtherListener** uppListener = (EtherListener**)lua_newuserdata(L, sizeof(EtherListener*));
+	*uppListener = pListener;
+	luaL_getmetatable(L, "EtherListener");
+	lua_setmetatable(L, -2);
+
+	return 1;
+}
+
+ETHER_API RemoveListener(lua_State* L)
+{
+	const char* name = lua_tostring(L, 1);
+	auto iter = listenerManager.mapListener.find(name);
+	(*iter).second->~EtherListener();
+	listenerManager.mapListener.erase(iter);
+
+	return 0;
+}
+
+ETHER_API listener_GetName(lua_State* L)
+{
+	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
+	lua_pushstring(L, pListener->name);
 
 	return 1;
 }
@@ -282,6 +470,121 @@ ETHER_API listener_GetKeyType(lua_State* L)
 ETHER_API listener_GetKeyMod(lua_State* L)
 {
 	lua_pushnumber(L, listenerManager.event.key.keysym.mod);
+
+	return 1;
+}
+
+ETHER_API listener_SetWindowShown(lua_State* L)
+{
+	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
+
+	if (pListener->type == EVENT_TYPE::WINDOW)
+		pListener->window.callShown = luaL_ref(L, LUA_REGISTRYINDEX);
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Callback Failed", "Type mismatch", nullptr);
+
+	return 0;
+}
+
+ETHER_API listener_SetWindowHidden(lua_State* L)
+{
+	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
+
+	if (pListener->type == EVENT_TYPE::WINDOW)
+		pListener->window.callHidden = luaL_ref(L, LUA_REGISTRYINDEX);
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Callback Failed", "Type mismatch", nullptr);
+
+	return 0;
+}
+
+ETHER_API listener_SetWindowEnter(lua_State* L)
+{
+	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
+
+	if (pListener->type == EVENT_TYPE::WINDOW)
+		pListener->window.callEnter = luaL_ref(L, LUA_REGISTRYINDEX);
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Callback Failed", "Type mismatch", nullptr);
+
+	return 0;
+}
+
+ETHER_API listener_SetWindowLeave(lua_State* L)
+{
+	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
+
+	if (pListener->type == EVENT_TYPE::WINDOW)
+		pListener->window.callLeave = luaL_ref(L, LUA_REGISTRYINDEX);
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Callback Failed", "Type mismatch", nullptr);
+
+	return 0;
+}
+
+ETHER_API listener_SetWindowFocusGained(lua_State* L)
+{
+	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
+
+	if (pListener->type == EVENT_TYPE::WINDOW)
+		pListener->window.callFocusGained = luaL_ref(L, LUA_REGISTRYINDEX);
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Callback Failed", "Type mismatch", nullptr);
+
+	return 0;
+}
+
+ETHER_API listener_SetWindowFocusLost(lua_State* L)
+{
+	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
+
+	if (pListener->type == EVENT_TYPE::WINDOW)
+		pListener->window.callFocusLost = luaL_ref(L, LUA_REGISTRYINDEX);
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Callback Failed", "Type mismatch", nullptr);
+
+	return 0;
+}
+
+ETHER_API listener_SetWindowClose(lua_State* L)
+{
+	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
+
+	if (pListener->type == EVENT_TYPE::WINDOW)
+		pListener->window.callClose = luaL_ref(L, LUA_REGISTRYINDEX);
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Callback Failed", "Type mismatch", nullptr);
+
+	return 0;
+}
+
+ETHER_API listener_SetWindowResize(lua_State* L)
+{
+	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
+
+	if (pListener->type == EVENT_TYPE::WINDOW)
+		pListener->window.callResize = luaL_ref(L, LUA_REGISTRYINDEX);
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Callback Failed", "Type mismatch", nullptr);
+
+	return 0;
+}
+
+ETHER_API listener_SetWindowMove(lua_State* L)
+{
+	EtherListener* pListener = (EtherListener*)(*(void**)luaL_checkudata(L, 1, "EtherListener"));
+
+	if (pListener->type == EVENT_TYPE::WINDOW)
+		pListener->window.callMove = luaL_ref(L, LUA_REGISTRYINDEX);
+	else
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Callback Failed", "Type mismatch", nullptr);
+
+	return 0;
+}
+
+ETHER_API listener_GetEventWindowID(lua_State* L)
+{
+	lua_pushnumber(L, listenerManager.event.window.windowID);
 
 	return 1;
 }
