@@ -53,16 +53,16 @@ ETHER_API sprite_AddImage(lua_State* L)
 {
 	EtherSprite* pSprite = (EtherSprite*)(*(void**)luaL_checkudata(L, 1, "EtherSprite"));
 	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 2, "EtherImage"));
+	luaL_argcheck(L, pImage, 1, "get image failed");
 
-	if (!pImage->isOpened)
+	if (pImage->refCount++ == 0)
 	{
 		pImage->pTexture = SDL_CreateTextureFromSurface(pSprite->pRenderer, pImage->pSurface);
 		SDL_SetTextureBlendMode(pImage->pTexture, SDL_BLENDMODE_BLEND);
-		pImage->isOpened = true;
+		pSprite->pImage = pImage;
 	}
 
 	pSprite->vImage.push_back(pImage);
-	pSprite->pImage = pImage;
 
 	return 0;
 }
@@ -73,7 +73,11 @@ ETHER_API sprite_DeleteImage(lua_State* L)
 	EtherSprite* pSprite = (EtherSprite*)(*(void**)luaL_checkudata(L, 1, "EtherSprite"));
 	unsigned int index = lua_tonumber(L, 2) - 1;
 
-	SDL_DestroyTexture(pSprite->vImage[index]->pTexture);
+	if (--pSprite->vImage[index]->refCount == 0)
+	{
+		SDL_DestroyTexture(pSprite->vImage[index]->pTexture);
+		pSprite->pImage = nullptr;
+	}
 
 	vector<EtherImage*>::iterator iter = pSprite->vImage.begin() + index;
 	pSprite->vImage.erase(iter);

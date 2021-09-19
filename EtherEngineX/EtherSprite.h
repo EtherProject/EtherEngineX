@@ -1,7 +1,7 @@
 #ifndef _SPRITE_H_
 #define _SPRITE_H_
 
-#include "EtherNode.h"
+#include "EtherGraphic.h"
 
 class EtherSprite :public EtherNode
 {

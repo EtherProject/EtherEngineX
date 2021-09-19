@@ -3,9 +3,8 @@
 
 #include "AdenJSON.h"
 
-#include "EtherNode.h"
+#include "EtherGraphic.h"
 #include "EtherWindow.h"
-#include "EtherImage.h"
 #include "EtherSprite.h"
 #include "EtherAction.h"
 #include "EtherEvent.h"

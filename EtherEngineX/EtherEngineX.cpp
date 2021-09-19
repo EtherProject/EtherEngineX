@@ -77,8 +77,7 @@ bool _LoadConfig()
 
 std::unordered_map<std::string, std::function<EtherModule* ()>> _mapMoudles = {
 	{ "EtherWindow",[] {return &ModuleWindow::Instance(); }},
-	{ "EtherImage", [] {return &ModuleImage::Instance(); }},
-	{ "EtherNode", [] {return &ModuleNode::Instance(); } },
+	{ "EtherGraphic", [] {return &ModuleGraphic::Instance(); } },
 	{ "EtherSprite", [] {return &ModuleSprite::Instance(); }},
 	{ "EtherAction", [] {return &ModuleAction::Instance(); }},
 	{ "EtherEvent", [] {return &ModuleEvent::Instance(); }},

@@ -148,10 +148,9 @@
     <ClCompile Include="EtherAction.cpp" />
     <ClCompile Include="EtherEngineX.cpp" />
     <ClCompile Include="EtherEvent.cpp" />
-    <ClCompile Include="EtherImage.cpp" />
     <ClCompile Include="EtherMedia.cpp" />
     <ClCompile Include="EtherModule.cpp" />
-    <ClCompile Include="EtherNode.cpp" />
+    <ClCompile Include="EtherGraphic.cpp" />
     <ClCompile Include="EtherSprite.cpp" />
     <ClCompile Include="EtherTimer.cpp" />
     <ClCompile Include="EtherUtils.cpp" />
@@ -162,11 +161,10 @@
     <ClInclude Include="EtherAction.h" />
     <ClInclude Include="EtherEngineX.h" />
     <ClInclude Include="EtherEvent.h" />
-    <ClInclude Include="EtherImage.h" />
     <ClInclude Include="EtherMacros.h" />
     <ClInclude Include="EtherMedia.h" />
     <ClInclude Include="EtherModule.h" />
-    <ClInclude Include="EtherNode.h" />
+    <ClInclude Include="EtherGraphic.h" />
     <ClInclude Include="EtherSprite.h" />
     <ClInclude Include="EtherTimer.h" />
     <ClInclude Include="EtherUtils.h" />

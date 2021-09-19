@@ -2,7 +2,6 @@
 #define _ACTION_H_
 
 #include "EtherModule.h"
-#include "EtherMacros.h"
 #include "EtherUtils.h"
 
 #include <unordered_map>

@@ -1,7 +1,5 @@
 #include "EtherAction.h"
 
-#include <iostream>
-
 ModuleAction& ModuleAction::Instance()
 {
 	static ModuleAction* _instance = new ModuleAction();

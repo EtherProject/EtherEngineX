@@ -3,7 +3,7 @@
 
 #include "EtherModule.h"
 #include "EtherUtils.h"
-#include "EtherNode.h"
+#include "EtherGraphic.h"
 
 #include <string>
 #include <unordered_map>

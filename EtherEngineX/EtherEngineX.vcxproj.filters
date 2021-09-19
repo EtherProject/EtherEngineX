@@ -27,7 +27,7 @@
     <ClCompile Include="EtherModule.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="EtherNode.cpp">
+    <ClCompile Include="EtherGraphic.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="AdenJSON.cpp">
@@ -43,9 +43,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="EtherSprite.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="EtherImage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="EtherTimer.cpp">
@@ -68,7 +65,7 @@
     <ClInclude Include="EtherModule.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="EtherNode.h">
+    <ClInclude Include="EtherGraphic.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="AdenJSON.h">
@@ -84,9 +81,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="EtherSprite.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="EtherImage.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="EtherTimer.h">
