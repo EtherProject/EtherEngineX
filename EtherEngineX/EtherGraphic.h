@@ -13,7 +13,7 @@ class EtherImage
 public:
 	EtherImage() {}
 
-	~EtherImage();
+	virtual ~EtherImage();
 
 	bool isDynamic = false;
 	double angle = 0;
@@ -40,6 +40,30 @@ public:
 
 	//引用计数
 	int refCount = 0;
+};
+
+enum class TEXT_PATTERN
+{
+	SOLID = 0,
+	SHADED,
+	BLENDED
+};
+
+enum class CODE_FORMAT
+{
+	NORMAL = 0,
+	UTF8
+};
+
+class EtherText : public EtherImage
+{
+public:
+	EtherText(const char*);
+	~EtherText() {}
+
+	const char* pContent = nullptr;
+	TEXT_PATTERN pattern = TEXT_PATTERN::BLENDED;
+	CODE_FORMAT format = CODE_FORMAT::NORMAL;
 };
 
 class EtherNode
@@ -158,5 +182,37 @@ ETHER_API node_RunAction(lua_State* L);
 ETHER_API node_SetPause(lua_State* L);
 
 ETHER_API __gc_Node(lua_State* L);
+
+ETHER_API LoadFontFromFile(lua_State* L);
+
+ETHER_API LoadFontFromData(lua_State* L);
+
+ETHER_API font_GetStyle(lua_State* L);
+
+ETHER_API font_SetStyle(lua_State* L);
+
+ETHER_API font_GetOutlineWidth(lua_State* L);
+
+ETHER_API font_SetOutlineWidth(lua_State* L);
+
+ETHER_API font_GetKerning(lua_State* L);
+
+ETHER_API font_SetKerning(lua_State* L);
+
+ETHER_API font_GetHeight(lua_State* L);
+
+ETHER_API font_GetTextSize(lua_State* L);
+
+ETHER_API font_GetUTF8TextSize(lua_State* L);
+
+ETHER_API __gc_Font(lua_State* L);
+
+ETHER_API CreateTextImage(lua_State* L);
+
+ETHER_API text_ResetText(lua_State* L);
+
+ETHER_API text_GetText(lua_State* L);
+
+ETHER_API __gc_Text(lua_State* L);
 
 #endif // !_NODE_H_

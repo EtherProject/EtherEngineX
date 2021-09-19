@@ -286,6 +286,7 @@ ETHER_API window_GetWindowID(lua_State* L)
 
 ETHER_API window_AddNode(lua_State* L)
 {
+	using namespace std;
 	EtherWindow* pEWindow = (EtherWindow*)(*(void**)luaL_checkudata(L, 1, "EtherWindow"));
 	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 2));
 

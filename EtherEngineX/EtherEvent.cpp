@@ -1,7 +1,5 @@
 #include "EtherEvent.h"
 
-#include <iostream>
-
 EtherListenerManager listenerManager;
 
 ModuleEvent& ModuleEvent::Instance()

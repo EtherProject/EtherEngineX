@@ -248,12 +248,12 @@ int main(int argc, char** argv)
 
 			//将画面绘制出来
 			for (auto iter = mapAllWindows.begin(); iter != mapAllWindows.end(); iter++)
+			{
+				SDL_RenderClear((*iter).second->pRenderer);
 				for (auto _iter = (*iter).second->vNode.begin(); _iter != (*iter).second->vNode.end(); _iter++)
-				{
-					SDL_RenderClear((*iter).second->pRenderer);
 					(*_iter)->Draw();
-					SDL_RenderPresent((*iter).second->pRenderer);
-				}
+				SDL_RenderPresent((*iter).second->pRenderer);
+			}
 
 			//延时,保证游戏帧数
 			unsigned int timeFrameEnd = SDL_GetTicks();

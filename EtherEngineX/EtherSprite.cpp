@@ -31,6 +31,7 @@ ModuleSprite::ModuleSprite()
 ETHER_API CreateSprite(lua_State* L)
 {
 	EtherSprite* pSprite = new EtherSprite();
+
 	EtherSprite** uppSprite = (EtherSprite**)lua_newuserdata(L, sizeof(EtherSprite*));
 	*uppSprite = pSprite;
 	luaL_getmetatable(L, "EtherSprite");
@@ -52,7 +53,7 @@ ETHER_API sprite_ChangeImage(lua_State* L)
 ETHER_API sprite_AddImage(lua_State* L)
 {
 	EtherSprite* pSprite = (EtherSprite*)(*(void**)luaL_checkudata(L, 1, "EtherSprite"));
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 2, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 2));
 	luaL_argcheck(L, pImage, 1, "get image failed");
 
 	if (pImage->refCount++ == 0)

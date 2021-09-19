@@ -5,7 +5,6 @@
 #include "EtherUtils.h"
 #include "EtherGraphic.h"
 
-#include <string>
 #include <unordered_map>
 #include <vector>
 

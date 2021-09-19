@@ -2,19 +2,24 @@
 
 #include <cmath>
 
+//管理动作的list
+std::vector<EtherNodeAction*> vAction;
+
 ModuleGraphic& ModuleGraphic::Instance()
 {
 	static ModuleGraphic* _instance = new ModuleGraphic();
 	return *_instance;
 }
 
+EtherText::EtherText(const char* content)
+{
+	pContent = content;
+}
+
 EtherImage::~EtherImage()
 {
 	SDL_DestroyTexture(pTexture);
 }
-
-//管理动作的list
-std::vector<EtherNodeAction*> vAction;
 
 EtherNodeAction::~EtherNodeAction()
 {
@@ -92,14 +97,30 @@ ModuleGraphic::ModuleGraphic()
 	{
 		{"LoadImageFromFile", LoadImageFromFile},
 		{"LoadImageFromData", LoadImageFromData},
-		{"CreateNode", CreateNode}
+		{"CreateNode", CreateNode},
+		{"LoadFontFromFile", LoadFontFromFile},
+		{"LoadFontFromData", LoadFontFromData},
+		{"CreateTextImage", CreateTextImage}
 	};
 
 	_vMacros =
 	{
 		{"FLIP_HORIZONTAL", SDL_FLIP_HORIZONTAL},
 		{"FLIP_VERTICAL", SDL_FLIP_VERTICAL},
-		{"FLIP_NONE", SDL_FLIP_NONE}
+		{"FLIP_NONE", SDL_FLIP_NONE},
+
+		{"FONT_STYLE_BOLD", TTF_STYLE_BOLD},
+		{"FONT_STYLE_ITALIC", TTF_STYLE_ITALIC},
+		{"FONT_STYLE_NORMAL", TTF_STYLE_NORMAL},
+		{"FONT_STYLE_STRIKETHROUGH", TTF_STYLE_STRIKETHROUGH},
+		{"FONT_STYLE_UNDERLINE", TTF_STYLE_UNDERLINE},
+
+		{"TEXT_PATTERN_SOLID", (int)TEXT_PATTERN::SOLID},
+		{"TEXT_PATTERN_SHADED", (int)TEXT_PATTERN::SHADED},
+		{"TEXT_PATTERN_BLENDED", (int)TEXT_PATTERN::BLENDED},
+
+		{"CODE_FORMAT_NORMAL", (int)CODE_FORMAT::NORMAL},
+		{"CODE_FORMAT_UTF8", (int)CODE_FORMAT::UTF8}
 	};
 
 	_vMetaData =
@@ -127,6 +148,16 @@ ModuleGraphic::ModuleGraphic()
 		},
 
 		{
+			"EtherText",
+			"EtherImage",
+			{
+				{"GetText", text_GetText},
+				{"ResetText", text_ResetText}
+			},
+			__gc_Text
+		},
+
+		{
 			"EtherNode",
 			nullptr,
 			{
@@ -144,6 +175,23 @@ ModuleGraphic::ModuleGraphic()
 				{"SetPause", node_SetPause}
 			},
 			__gc_Node
+		},
+
+		{
+			"EtherFont",
+			nullptr,
+			{
+				{"GetStyle", font_GetStyle},
+				{"SetStyle", font_SetStyle},
+				{"GetOutlineWidth", font_GetOutlineWidth},
+				{"SetOutlineWidth", font_SetOutlineWidth},
+				{"GetKerning", font_GetKerning},
+				{"SetKerning", font_SetKerning},
+				{"GetHeight", font_GetHeight},
+				{"GetTextSize", font_GetTextSize},
+				{"GetUTF8TextSize", font_GetUTF8TextSize}
+			},
+			__gc_Font
 		}
 	};
 }
@@ -230,7 +278,7 @@ ETHER_API LoadImageFromData(lua_State* L)
 
 ETHER_API image_SetImageDynamic(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 	pImage->isDynamic = lua_toboolean(L, 2);
 
 	if (pImage->isDynamic)
@@ -255,7 +303,7 @@ ETHER_API image_SetImageDynamic(lua_State* L)
 
 ETHER_API image_SetAnchorPoint(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 	pImage->anchorPoint.x = lua_tonumber(L, 2);
 	pImage->anchorPoint.y = lua_tonumber(L, 3);
 
@@ -264,7 +312,7 @@ ETHER_API image_SetAnchorPoint(lua_State* L)
 
 ETHER_API image_GetAnchorPoint(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 
 	lua_newtable(L);
 	lua_pushstring(L, "x");
@@ -279,7 +327,7 @@ ETHER_API image_GetAnchorPoint(lua_State* L)
 
 ETHER_API image_SetRendererFlip(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 
 	lua_pushnil(L);
 	while (lua_next(L, 2))
@@ -314,7 +362,7 @@ ETHER_API image_SetRendererFlip(lua_State* L)
 
 ETHER_API image_SetImageRect(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 
 	SDL_Rect reshapeRect = GetRectParam(L, 2);
 	pImage->imageRect = reshapeRect;
@@ -324,7 +372,7 @@ ETHER_API image_SetImageRect(lua_State* L)
 
 ETHER_API image_GetImageRect(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 
 	lua_newtable(L);
 	lua_pushstring(L, "x");
@@ -345,7 +393,7 @@ ETHER_API image_GetImageRect(lua_State* L)
 
 ETHER_API image_SetAlpha(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 
 	if (pImage->refCount != 0)
 		SDL_SetTextureAlphaMod(pImage->pTexture, luaL_checknumber(L, 2));
@@ -357,7 +405,7 @@ ETHER_API image_SetAlpha(lua_State* L)
 
 ETHER_API image_GetAlpha(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 
 	Uint8 alpha;
 	SDL_GetTextureAlphaMod(pImage->pTexture, &alpha);
@@ -368,7 +416,7 @@ ETHER_API image_GetAlpha(lua_State* L)
 
 ETHER_API image_SetPlaySpeed(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 	unsigned short playSpeed = lua_tonumber(L, 2);
 	pImage->playSpeed = playSpeed;
 
@@ -377,7 +425,7 @@ ETHER_API image_SetPlaySpeed(lua_State* L)
 
 ETHER_API image_GetPlaySpeed(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 	lua_pushnumber(L, pImage->playSpeed);
 
 	return 1;
@@ -385,7 +433,7 @@ ETHER_API image_GetPlaySpeed(lua_State* L)
 
 ETHER_API image_SetCurrentFrame(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 	if (pImage->isDynamic)
 	{
 		pImage->currentFrame = lua_tonumber(L, 2);
@@ -400,7 +448,7 @@ ETHER_API image_SetCurrentFrame(lua_State* L)
 
 ETHER_API image_GetCurrentFrame(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 	if (pImage->isDynamic)
 		lua_pushnumber(L, pImage->currentFrame);
 	else
@@ -411,7 +459,7 @@ ETHER_API image_GetCurrentFrame(lua_State* L)
 
 ETHER_API image_SetAngle(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 	double angle = lua_tonumber(L, 2);
 
 	return 0;
@@ -419,7 +467,7 @@ ETHER_API image_SetAngle(lua_State* L)
 
 ETHER_API image_GetAngle(lua_State* L)
 {
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 1, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 1));
 	lua_pushnumber(L, pImage->angle);
 
 	return 1;
@@ -447,7 +495,7 @@ ETHER_API CreateNode(lua_State* L)
 ETHER_API node_SetImage(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
-	EtherImage* pImage = (EtherImage*)(*(void**)luaL_checkudata(L, 2, "EtherImage"));
+	EtherImage* pImage = (EtherImage*)(*(void**)lua_touserdata(L, 2));
 
 	if (pImage == pNode->pImage) 
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, "Set Image Failed", "Same as current image", nullptr);;
@@ -626,6 +674,320 @@ ETHER_API __gc_Node(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	delete pNode;
+
+	return 0;
+}
+
+ETHER_API LoadFontFromFile(lua_State* L)
+{
+	TTF_Font* pFont = TTF_OpenFont(luaL_checkstring(L, 1), luaL_checknumber(L, 2));
+	luaL_argcheck(L, pFont, 1, "load font failed");
+
+	TTF_Font** uppFont = (TTF_Font**)lua_newuserdata(L, sizeof(TTF_Font*));
+	*uppFont = pFont;
+	luaL_getmetatable(L, "EtherFont");
+	lua_setmetatable(L, -2);
+
+	return 1;
+}
+
+ETHER_API LoadFontFromData(lua_State* L)
+{
+	size_t size = 0;
+	TTF_Font* pFont = TTF_OpenFontRW(SDL_RWFromMem((void*)luaL_checklstring(L, 1, &size), size), 1, luaL_checknumber(L, 2));
+	luaL_argcheck(L, pFont, 1, "load font failed");
+
+	TTF_Font** uppFont = (TTF_Font**)lua_newuserdata(L, sizeof(TTF_Font*));
+	*uppFont = pFont;
+	luaL_getmetatable(L, "EtherFont");
+	lua_setmetatable(L, -2);
+
+	return 1;
+}
+
+ETHER_API font_GetStyle(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	lua_newtable(L);
+	int style = TTF_GetFontStyle(pFont);
+	if (style == TTF_STYLE_NORMAL)
+	{
+		lua_pushnumber(L, 1);
+		lua_pushnumber(L, TTF_STYLE_NORMAL);
+		lua_settable(L, -3);
+	}
+	else
+	{
+		int index = 1;
+		if (style & TTF_STYLE_BOLD)
+		{
+			lua_pushnumber(L, index);
+			lua_pushnumber(L, TTF_STYLE_BOLD);
+			lua_settable(L, -3);
+			index++;
+		}
+		if (style & TTF_STYLE_ITALIC)
+		{
+			lua_pushnumber(L, index);
+			lua_pushnumber(L, TTF_STYLE_ITALIC);
+			lua_settable(L, -3);
+			index++;
+		}
+		if (style & TTF_STYLE_UNDERLINE)
+		{
+			lua_pushnumber(L, index);
+			lua_pushnumber(L, TTF_STYLE_UNDERLINE);
+			lua_settable(L, -3);
+			index++;
+		}
+		if (style & TTF_STYLE_STRIKETHROUGH)
+		{
+			lua_pushnumber(L, index);
+			lua_pushnumber(L, TTF_STYLE_STRIKETHROUGH);
+			lua_settable(L, -3);
+			index++;
+		}
+	}
+	return 1;
+}
+
+ETHER_API font_SetStyle(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+	luaL_argcheck(L, lua_istable(L, 2), 2, "table expected");
+
+	int style = 0;
+	lua_pushnil(L);
+	while (lua_next(L, 2))
+	{
+		lua_pushvalue(L, -2);
+		if (!lua_isnumber(L, -2))
+			luaL_error(L, "bad argument #2 to 'SetFontStyle' (table elements must be MACRO number, got %s)", luaL_typename(L, -2));
+		else
+		{
+			switch ((int)lua_tonumber(L, -2))
+			{
+			case TTF_STYLE_BOLD:
+				style |= TTF_STYLE_BOLD;
+				break;
+			case TTF_STYLE_ITALIC:
+				style |= TTF_STYLE_ITALIC;
+				break;
+			case TTF_STYLE_UNDERLINE:
+				style |= TTF_STYLE_UNDERLINE;
+				break;
+			case TTF_STYLE_STRIKETHROUGH:
+				style |= TTF_STYLE_STRIKETHROUGH;
+				break;
+			case TTF_STYLE_NORMAL:
+				style |= TTF_STYLE_NORMAL;
+				break;
+			default:
+				luaL_error(L, "bad argument #2 to 'SetFontStyle' (table elements must be MACRO number, got %s)", luaL_typename(L, -2));
+				break;
+			}
+		}
+		lua_pop(L, 2);
+	}
+
+	TTF_SetFontStyle(pFont, style);
+
+	return 0;
+}
+
+ETHER_API font_GetOutlineWidth(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	lua_pushnumber(L, TTF_GetFontOutline(pFont));
+
+	return 1;
+}
+
+
+ETHER_API font_SetOutlineWidth(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	TTF_SetFontOutline(pFont, luaL_checknumber(L, 2));
+
+	return 0;
+}
+
+ETHER_API font_GetKerning(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	lua_pushnumber(L, TTF_GetFontKerning(pFont));
+
+	return 1;
+}
+
+
+ETHER_API font_SetKerning(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	TTF_SetFontKerning(pFont, luaL_checknumber(L, 2));
+
+	return 0;
+}
+
+
+ETHER_API font_GetHeight(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	lua_pushnumber(L, TTF_FontHeight(pFont));
+
+	return 1;
+}
+
+
+ETHER_API font_GetTextSize(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	int width, height;
+	TTF_SizeText(pFont, luaL_checkstring(L, 2), &width, &height);
+	lua_pushnumber(L, width);
+	lua_pushnumber(L, height);
+
+	return 2;
+}
+
+
+ETHER_API font_GetUTF8TextSize(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	int width, height;
+	TTF_SizeUTF8(pFont, luaL_checkstring(L, 2), &width, &height);
+	lua_pushnumber(L, width);
+	lua_pushnumber(L, height);
+
+	return 2;
+}
+
+ETHER_API __gc_Font(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	TTF_CloseFont(pFont);
+	pFont = nullptr;
+
+	return 0;
+}
+
+ETHER_API CreateTextImage(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	const char* content = luaL_checkstring(L, 2);
+	TEXT_PATTERN paramPattern = (TEXT_PATTERN)lua_tonumber(L, -2);
+	CODE_FORMAT paramFormat = (CODE_FORMAT)lua_tonumber(L, -1);
+
+	EtherText* pText = new EtherText(content);
+	switch (paramPattern)
+	{
+	case TEXT_PATTERN::SOLID:
+		SDL_Color color = GetColorParam(L, 3);
+		if (paramFormat == CODE_FORMAT::NORMAL)
+			pText->pSurface = TTF_RenderText_Solid(pFont, content, color);
+		else
+			pText->pSurface = TTF_RenderUTF8_Solid(pFont, content, color);
+		break;
+	case TEXT_PATTERN::SHADED:
+		SDL_Color fgColor = GetColorParam(L, 3);
+		SDL_Color bgColor = GetColorParam(L, 4);
+		if (paramFormat == CODE_FORMAT::NORMAL)
+			pText->pSurface = TTF_RenderText_Shaded(pFont, content, fgColor, bgColor);
+		else
+			pText->pSurface = TTF_RenderUTF8_Shaded(pFont, content, fgColor, bgColor);
+		break;
+	case TEXT_PATTERN::BLENDED:
+		SDL_Color _color = GetColorParam(L, 3);
+		if (paramFormat == CODE_FORMAT::NORMAL)
+			pText->pSurface = TTF_RenderText_Blended(pFont, content, _color);
+		else
+			pText->pSurface = TTF_RenderUTF8_Blended(pFont, content, _color);
+	}
+	luaL_argcheck(L, pText->pSurface, 1, "create text image failed");
+
+	pText->imageRect.x = 0;
+	pText->imageRect.y = 0;
+	pText->imageRect.w = pText->pSurface->w;
+	pText->imageRect.h = pText->pSurface->h;
+
+	EtherText** uppText = (EtherText**)lua_newuserdata(L, sizeof(EtherText*));
+	*uppText = pText;
+	luaL_getmetatable(L, "EtherText");
+	lua_setmetatable(L, -2);
+
+	return 1;
+}
+
+ETHER_API text_ResetText(lua_State* L)
+{
+	TTF_Font* pFont = (TTF_Font*)(*(void**)luaL_checkudata(L, 1, "EtherFont"));
+	luaL_argcheck(L, pFont, 1, "get font failed");
+
+	const char* content = luaL_checkstring(L, 2);
+	TEXT_PATTERN paramPattern = (TEXT_PATTERN)lua_tonumber(L, -2);
+	CODE_FORMAT paramFormat = (CODE_FORMAT)lua_tonumber(L, -1);
+
+	EtherText* pText = new EtherText(content);
+	switch (paramPattern)
+	{
+	case TEXT_PATTERN::SOLID:
+		SDL_Color color = GetColorParam(L, 3);
+		if (paramFormat == CODE_FORMAT::NORMAL)
+			pText->pSurface = TTF_RenderText_Solid(pFont, content, color);
+		else
+			pText->pSurface = TTF_RenderUTF8_Solid(pFont, content, color);
+		break;
+	case TEXT_PATTERN::SHADED:
+		SDL_Color fgColor = GetColorParam(L, 3);
+		SDL_Color bgColor = GetColorParam(L, 4);
+		if (paramFormat == CODE_FORMAT::NORMAL)
+			pText->pSurface = TTF_RenderText_Shaded(pFont, content, fgColor, bgColor);
+		else
+			pText->pSurface = TTF_RenderUTF8_Shaded(pFont, content, fgColor, bgColor);
+		break;
+	case TEXT_PATTERN::BLENDED:
+		SDL_Color _color = GetColorParam(L, 3);
+		if (paramFormat == CODE_FORMAT::NORMAL)
+			pText->pSurface = TTF_RenderText_Blended(pFont, content, _color);
+		else
+			pText->pSurface = TTF_RenderUTF8_Blended(pFont, content, _color);
+	}
+	return 0;
+}
+
+ETHER_API text_GetText(lua_State* L)
+{
+	EtherText* pText = (EtherText*)(*(void**)luaL_checkudata(L, 1, "EtherText"));
+	lua_pushstring(L, pText->pContent);
+
+	return 1;
+}
+
+ETHER_API __gc_Text(lua_State* L)
+{
+	EtherText* pText = (EtherText*)(*(void**)luaL_checkudata(L, 1, "EtherText"));
+	delete pText;
 
 	return 0;
 }
