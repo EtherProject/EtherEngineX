@@ -533,7 +533,7 @@ ETHER_API node_GetImage(lua_State* L)
 	luaL_getmetatable(L, "EtherImage");
 	lua_setmetatable(L, -2);
 
-	return 0;
+	return 1;
 }
 
 ETHER_API node_SetCopyRect(lua_State* L)
@@ -586,6 +586,7 @@ ETHER_API node_GetParent(lua_State* L)
 {
 	EtherNode* pNode = (EtherNode*)(*(void**)lua_touserdata(L, 1));
 	EtherNode** uppNode = (EtherNode**)lua_newuserdata(L, sizeof(EtherNode*));
+
 	*uppNode = pNode->parent;
 	luaL_getmetatable(L, "EtherNode");
 	lua_setmetatable(L, -2);
