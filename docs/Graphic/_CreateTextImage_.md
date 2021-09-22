@@ -20,14 +20,14 @@ text = CreateTextImage(font, content, [, color], textPattern, codeFormat)
 
 + textPattern [enum-class]：文本模式
 
-    + TEXT_PATTERN_SOLID：使用SOLOD模式创建文本
-    + 此时[, color]只有一个参数，表示字体的颜色
+    + TEXT_PATTERN_SOLID：使用 `SOLOD模式` 创建文本
+    + 此时 `[, color]` 只有一个参数，表示字体的颜色
 
-    + TEXT_PATTERN_SHADED：使用SHADED模式创建文本
-    + 此时[, color]有两个参数，第一个表示字体的颜色，第二个表示背景的颜色
+    + TEXT_PATTERN_SHADED：使用 `SHADED模式` 创建文本
+    + 此时 `[, color]` 有两个参数，第一个表示字体的颜色，第二个表示背景的颜色
 
-    + TEXT_PATTERN_BLENDED：
-    + 此时[, color]只有一个参数，表示字体的颜色
+    + TEXT_PATTERN_BLENDED：使用 `BLENDED模式` 创建文本
+    + 此时 `[, color]` 只有一个参数，表示字体的颜色
 
 + codeFormat [enum-class]：编码格式
 
@@ -45,6 +45,6 @@ text = CreateTextImage(font, content, [, color], textPattern, codeFormat)
 
 Graphic = UsingModule("EtherGraphic")
 local font = Graphic.LoadFontFromData("msyh.ttf", 50)
-text = Graphic.CreateTextImage(font, "东方Project", {r = 255, g = 0, b = 0}, Graphic.TEXT_PATTERN_BLENDED, Graphic.CODE_FORMAT_UTF8)
+local text = Graphic.CreateTextImage(font, "东方Project", {r = 255, g = 0, b = 0}, Graphic.TEXT_PATTERN_BLENDED, Graphic.CODE_FORMAT_UTF8)
 
 ```

@@ -102,4 +102,4 @@
 
     + [Text:ResetText(font, content, [, color], textPattern, codeFormat)](_Text_ResetText_.md)：重新设置文本图像
 
-    + [Text:GetText()](_Text_GetText_.md)：获取文本图像的文字内容
+    + [Text:GetContent()](_Text_GetContent_.md)：获取文本图像的文字内容

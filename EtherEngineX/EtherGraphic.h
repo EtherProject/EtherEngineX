@@ -211,7 +211,7 @@ ETHER_API CreateTextImage(lua_State* L);
 
 ETHER_API text_ResetText(lua_State* L);
 
-ETHER_API text_GetText(lua_State* L);
+ETHER_API text_GetContent(lua_State* L);
 
 ETHER_API __gc_Text(lua_State* L);
 

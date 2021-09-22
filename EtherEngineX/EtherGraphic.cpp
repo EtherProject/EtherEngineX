@@ -151,7 +151,7 @@ ModuleGraphic::ModuleGraphic()
 			"EtherText",
 			"EtherImage",
 			{
-				{"GetText", text_GetText},
+				{"GetContent", text_GetContent},
 				{"ResetText", text_ResetText}
 			},
 			__gc_Text
@@ -977,7 +977,7 @@ ETHER_API text_ResetText(lua_State* L)
 	return 0;
 }
 
-ETHER_API text_GetText(lua_State* L)
+ETHER_API text_GetContent(lua_State* L)
 {
 	EtherText* pText = (EtherText*)(*(void**)luaL_checkudata(L, 1, "EtherText"));
 	lua_pushstring(L, pText->pContent);
