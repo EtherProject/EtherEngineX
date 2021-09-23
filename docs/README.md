@@ -12,7 +12,7 @@
 
 + [Action](Action/README.md)：动作相关操作
 
-+ [Event](Graphic/README.md)：交互相关操作
++ [Event](Event/README.md)：交互相关操作
 
 + [Media](Media/README.md)：媒体相关操作
 

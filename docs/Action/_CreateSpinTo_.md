@@ -29,8 +29,8 @@ action = CreateSpinTo(angle, time, direction)
 
 ```lua
 
-Graphic = UsingModule("EtherGraphic")
-local action = Graphic.CreateSpinTo(60, 4, ROTATION_ANTI_CLOCKWISE)
+Action = UsingModule("EtherAction")
+local action = Action.CreateSpinTo(60, 4, ROTATION_ANTI_CLOCKWISE)
 
 ```
 

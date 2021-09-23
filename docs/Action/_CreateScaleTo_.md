@@ -26,8 +26,8 @@ action = CreateScaleTo(w, h, time)
 
 ```lua
 
-Graphic = UsingModule("EtherGraphic")
-local action = Graphic.CreateScaleTo(200, 200, 4)
+Action = UsingModule("EtherAction")
+local action = Action.CreateScaleTo(200, 200, 4)
 
 ```
 

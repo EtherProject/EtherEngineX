@@ -24,8 +24,8 @@ action:SetCallback(callback)
 
 ```lua
 
-Graphic = UsingModule("EtherGraphic")
-local action = Graphic.CreateMoveTo({x = 200, y = 200}, 4)
+Action = UsingModule("EtherAction")
+local action = Action.CreateMoveTo({x = 200, y = 200}, 4)
 action:SetCallback(funciton()
     print("Callback~")
 end)

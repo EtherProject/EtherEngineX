@@ -25,7 +25,8 @@ sprite:DeleteImage(index)
 ```lua
 
 Graphic = UsingModule("EtherGraphic")
-local sprite = Graphic.CreateSprite()
+Sprite = UsingModule("EtherSprite")
+local sprite = Sprite.CreateSprite()
 local image = Graphic.LoadImageFromFile("test.png")
 sprite:AddImage(image)
 sprite:DeleteImage(1)

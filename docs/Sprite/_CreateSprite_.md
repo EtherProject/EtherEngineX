@@ -22,7 +22,7 @@ sprite = CreateSprite()
 
 ```lua
 
-Graphic = UsingModule("EtherGraphic")
-local sprite = Graphic.CreateSprite()
+Sprite = UsingModule("EtherSprite")
+local sprite = Sprite.CreateSprite()
 
 ```

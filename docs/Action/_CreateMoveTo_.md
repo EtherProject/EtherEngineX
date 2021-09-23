@@ -24,7 +24,7 @@ action = CreateMoveTo(point, time)
 
 ```lua
 
-Graphic = UsingModule("EtherGraphic")
+Action = UsingModule("EtherAction")
 local action = Graphic.CreateMoveTo({x = 50, y = 50}, 4)
 
 ```

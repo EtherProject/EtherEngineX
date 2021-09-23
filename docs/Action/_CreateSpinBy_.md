@@ -24,8 +24,8 @@ action = CreateSpinBy(angle, time)
 
 ```lua
 
-Graphic = UsingModule("EtherGraphic")
-local action = Graphic.CreateSpinBy(720, 4)
+Action = UsingModule("EtherAction")
+local action = Action.CreateSpinBy(720, 4)
 
 ```
 

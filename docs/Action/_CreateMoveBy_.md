@@ -24,8 +24,8 @@ action = CreateMoveBy(distance, time)
 
 ```lua
 
-Graphic = UsingModule("EtherGraphic")
-local action = Graphic.CreateMoveBy({x = 100, y = 100}, 4)
+Action = UsingModule("EtherAction")
+local action = Action.CreateMoveBy({x = 100, y = 100}, 4)
 
 ```
 
