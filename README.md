@@ -10,6 +10,7 @@
 **EtherEngineX** is the refactor of game development based on [**EtherEngine**](https://github.com/EtherProject/EtherEngine). Compared with [**EtherEngine**](https://github.com/EtherProject/EtherEngine), **EtherEngineX** adds more modern game development concepts such as **scene manager, camera and game object**.
 
 EtherEngineX文档由[此处](docs/README.md)去，当前只有中文版本。
+
 EtherEngineX's document is [here](docs/README.md), now there is only Chinese version.
 
 > 本项目正处于开发阶段，欢迎为项目贡献代码或提出您的设计建议，记得在右上角留下您的关注 ~
